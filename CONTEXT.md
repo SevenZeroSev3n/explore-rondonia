@@ -31,7 +31,7 @@ so pt-BR and English ship together from the MVP.
 ## MVP scope
 
 In: passport loop (ADR 0008) — start in Vilhena with a one-screen tutorial, end when 4 stamps,
-4 Madeira-Mamoré photos and 2–3 real roadside secrets are collected (30–45 min); photo mode on
+4 Madeira-Mamoré photos and 3 real roadside secrets are collected (30–45 min); photo mode on
 both layers; walking on foot in the diorama; potholes and dirt slow the vehicle (no game over);
 BR-364 from Vilhena to Porto Velho; cities Vilhena, Ji-Paraná, Ariquemes, Porto Velho
 (markers + sheet); one diorama — Madeira-Mamoré Railway (locomotive, railway sheds, Três Caixas

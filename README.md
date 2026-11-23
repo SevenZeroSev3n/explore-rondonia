@@ -13,7 +13,7 @@ photograph landmarks from the right angle to unlock what those places really loo
 
 Start in Vilhena with an empty passport and drive a pickup truck up BR-364 on a stylized state
 map (Vilhena → Ji-Paraná → Ariquemes → Porto Velho), plus one explorable diorama: the Madeira-Mamoré Railway
-complex in Porto Velho, explored on foot. Collect 4 city stamps, 4 landmark photos and 2–3 real
+complex in Porto Velho, explored on foot. Collect 4 city stamps, 4 landmark photos and 3 real
 roadside secrets to complete the passport (30–45 min). Desktop browser (keyboard / gamepad),
 released on itch.io.
 

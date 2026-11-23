@@ -26,11 +26,13 @@ exploration and collection, freight/delivery trucking, arcade driving, story adv
 - **Light friction, no game over:** BR-364 potholes and dirt stretches slow the vehicle; secrets
   off the road reward leaving the asphalt.
 - **Secrets are real places** near BR-364 (viewpoints, waterfalls, bridges, river beaches),
-  researched with sources, approved by the owner, each with a real-photo sheet.
+  researched with sources, approved by the owner, each with a real-photo sheet. MVP secrets
+  (`docs/research/roadside-secrets.md`): Cachoeira do Rio Mandi (Nova União), the Rondon telegraph
+  station on the Machado river (Ji-Paraná) and Cachoeira do Teotônio (Porto Velho).
 - **Start:** Vilhena, empty passport, a one-screen embedded tutorial (drive, open passport, take a
   photo); the Vilhena stamp is the first reward. Free order afterwards.
 - **MVP ending:** 4 city stamps (Vilhena, Ji-Paraná, Ariquemes, Porto Velho) + the 4 Madeira-Mamoré
-  photos (locomotive, railway sheds, Três Caixas d'Água, Madeira river bank) + 2–3 roadside secrets
+  photos (locomotive, railway sheds, Três Caixas d'Água, Madeira river bank) + the 3 roadside secrets
   → "passport complete" screen, then credits. Target session: 30–45 minutes.
 - **Publishing:** itch.io is the main showcase (page with GIF and screenshots, PT/EN); GitHub Pages
   stays as the continuously updated development build.

@@ -2,6 +2,7 @@
 
 - Status: accepted
 - Date: 2026-11-23
+- Amended: 2026-11-23 (photo sources — Commons has almost nothing on the MVP secrets)
 
 ## Context
 
@@ -14,8 +15,9 @@ A large foreign audience is expected. Text in code makes translation and review 
 - Player-facing strings live in `data/i18n/`; each place lives in `data/places/` with text in both
   languages, photos and credits. The agent drafts both languages; the owner reviews both.
 - Local proper names stay in Portuguese with a short English gloss.
-- MVP photos come from **Wikimedia Commons**, each with author and license credited on its sheet
-  and in the credits screen.
+- Photos come from **Wikimedia Commons** when a free photo exists; otherwise from the **owner's own
+  photos** or **third parties with written permission** (e.g. a park, a city hall). Every photo is
+  credited with author and license (or permission) on its sheet and in the credits screen.
 
 ## Consequences
 
