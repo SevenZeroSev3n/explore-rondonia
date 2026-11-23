@@ -18,6 +18,14 @@ fast but cannot express holes or overhangs (locomotive wheels, open cab, arcades
 - The MVP **accepts the simplified silhouettes** of AI landmarks. Any asset can later be replaced
   by a MagicaVoxel version without game changes, because the slice-sheet format is the contract.
 
+## Update (2026-11-23)
+
+The agent's only image generator (Figma AI) spends paid AI credits, which the owner's Starter
+plan with a View seat may not include; the owner chose to generate the four-view sheets
+elsewhere from the prompts in `art/views/README.md`.
+`tools/views_to_slices.py` carves them (visual hull: a voxel stays where the top, side and
+front/back silhouettes all see the object) into the same sizes as the placeholders.
+
 ## Consequences
 
 - Source art lives in `art/`; only final slice sheets live in `game/assets/stacks/<name>/`.

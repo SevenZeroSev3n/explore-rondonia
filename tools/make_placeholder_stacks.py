@@ -224,7 +224,7 @@ def shed_slices() -> list[Image.Image]:
         if z <= 12:
             outline(s, 1, 1, 62, 34, BRICK if z % 4 else BRICK_DARK)
             if z <= 8:
-                rect(s, 26, 34, 37, 34, CLEAR)         # big door on the front side
+                rect(s, 26, 1, 37, 1, CLEAR)           # big door on the front side (top = front)
             if 5 <= z <= 8:
                 for x0 in (6, 16, 46, 56):
                     rect(s, x0, 34, x0 + 2, 34, CLEAR)  # windows
