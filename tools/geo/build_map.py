@@ -33,9 +33,10 @@ ROAD_EPSILON_PX = 1.0
 RIVER_EPSILON_PX = 3.0
 BORDER_EPSILON_PX = 4.0
 
+# Shown as-is in both languages: names and licences only, no prose to translate.
 ATTRIBUTION = [
-    "Road, rivers and towns: © OpenStreetMap contributors, ODbL",
-    "State border: IBGE, Malhas territoriais",
+    "© OpenStreetMap contributors (ODbL)",
+    "IBGE — Malhas territoriais",
 ]
 
 

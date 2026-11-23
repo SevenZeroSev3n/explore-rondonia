@@ -24,5 +24,22 @@
   "ENTER_DIORAMA": {"en": "Enter: explore the Madeira-Mamoré Railway", "pt_BR": "Enter: explorar a Estrada de Ferro Madeira-Mamoré"},
   "EXIT_DIORAMA": {"en": "Enter: back to the road", "pt_BR": "Enter: voltar para a estrada"},
   "DIORAMA_KEYS": {"en": "WASD: walk · Q/E: turn the view · F: camera · P: passport", "pt_BR": "WASD: andar · Q/E: girar a vista · F: câmera · P: passaporte"},
-  "DIORAMA_WELCOME": {"en": "Madeira-Mamoré Railway, Porto Velho", "pt_BR": "Estrada de Ferro Madeira-Mamoré, Porto Velho"}
+  "DIORAMA_WELCOME": {"en": "Madeira-Mamoré Railway, Porto Velho", "pt_BR": "Estrada de Ferro Madeira-Mamoré, Porto Velho"},
+  "TUTORIAL_TITLE": {"en": "Welcome to Rondônia", "pt_BR": "Boas-vindas a Rondônia"},
+  "TUTORIAL_BODY": {"en": "You are on BR-364 in Vilhena, the southern gateway to the state, with an empty tourist passport. Every place in this game is real.", "pt_BR": "Você está na BR-364, em Vilhena, a porta de entrada sul do estado, com um passaporte turístico em branco. Todos os lugares deste jogo existem de verdade."},
+  "TUTORIAL_KEYS": {"en": "W/S or arrows: drive and brake · A/D: steer\nP: passport · F: camera, then Space to shoot", "pt_BR": "W/S ou setas: acelerar e frear · A/D: virar\nP: passaporte · F: câmera, depois Espaço para fotografar"},
+  "TUTORIAL_GOAL": {"en": "Fill the passport: stamp Vilhena, Ji-Paraná, Ariquemes and Porto Velho, photograph the Madeira-Mamoré Railway in Porto Velho, and find the 3 secrets hidden near the road.", "pt_BR": "Complete o passaporte: carimbe Vilhena, Ji-Paraná, Ariquemes e Porto Velho, fotografe a Estrada de Ferro Madeira-Mamoré em Porto Velho e encontre os 3 segredos escondidos perto da estrada."},
+  "TUTORIAL_START": {"en": "Let's go", "pt_BR": "Vamos lá"},
+  "PASSPORT_LANDMARKS": {"en": "Madeira-Mamoré photos (Porto Velho)", "pt_BR": "Fotos da Madeira-Mamoré (Porto Velho)"},
+  "PASSPORT_NOT_TAKEN": {"en": "no photo yet", "pt_BR": "sem foto ainda"},
+  "PASSPORT_HELP": {"en": "How to play", "pt_BR": "Como jogar"},
+  "PASSPORT_CREDITS": {"en": "Credits", "pt_BR": "Créditos"},
+  "HUD_LANDMARKS": {"en": "Madeira-Mamoré %d/%d", "pt_BR": "Madeira-Mamoré %d/%d"},
+  "COMPLETE_TITLE": {"en": "Passport complete!", "pt_BR": "Passaporte completo!"},
+  "COMPLETE_BODY": {"en": "You stamped all four cities, photographed the Madeira-Mamoré Railway and found the three secrets of BR-364. Rondônia has much more to see: the other tourism regions come next.", "pt_BR": "Você carimbou as quatro cidades, fotografou a Estrada de Ferro Madeira-Mamoré e encontrou os três segredos da BR-364. Rondônia tem muito mais para ver: os outros polos turísticos vêm a seguir."},
+  "COMPLETE_CONTINUE": {"en": "Keep exploring", "pt_BR": "Continuar explorando"},
+  "CREDITS_TITLE": {"en": "Credits", "pt_BR": "Créditos"},
+  "CREDITS_CODE": {"en": "Code: MIT · Original art: CC BY 4.0", "pt_BR": "Código: MIT · Arte original: CC BY 4.0"},
+  "CREDITS_ENGINE": {"en": "Made with Godot Engine (MIT licence)", "pt_BR": "Feito com Godot Engine (licença MIT)"},
+  "CREDITS_SOURCES": {"en": "Place texts based on: %s", "pt_BR": "Textos dos lugares baseados em: %s"}
 }

@@ -7,6 +7,10 @@ const VERSION := 1
 
 var passport := Passport.new()
 var locale := ""
+## One-off flags: "tutorial_seen", "completion_seen".
+var flags := {}
+## Tests turn this off so they never write over the player's save.
+var persist := true
 
 
 func _ready() -> void:
@@ -24,18 +28,33 @@ func load_save() -> void:
 	var d := decode(FileAccess.get_file_as_string(PATH))
 	passport = Passport.from_dict(d.get("passport", {}))
 	locale = str(d.get("locale", ""))
+	var raw_flags: Variant = d.get("flags", {})
+	flags = raw_flags if typeof(raw_flags) == TYPE_DICTIONARY else {}
 
 
 func save() -> void:
+	if not persist:
+		return
 	var f := FileAccess.open(PATH, FileAccess.WRITE)
 	if f == null:
 		push_warning("could not write save: %s" % FileAccess.get_open_error())
 		return
-	f.store_string(encode(passport, locale))
+	f.store_string(encode(passport, locale, flags))
 
 
-static func encode(p: Passport, loc: String) -> String:
-	return JSON.stringify({"version": VERSION, "locale": loc, "passport": p.to_dict()})
+func has_flag(flag: String) -> bool:
+	return bool(flags.get(flag, false))
+
+
+func set_flag(flag: String) -> void:
+	if has_flag(flag):
+		return
+	flags[flag] = true
+	save()
+
+
+static func encode(p: Passport, loc: String, f: Dictionary = {}) -> String:
+	return JSON.stringify({"version": VERSION, "locale": loc, "passport": p.to_dict(), "flags": f})
 
 
 ## A missing or corrupt save is a fresh start, never a crash.

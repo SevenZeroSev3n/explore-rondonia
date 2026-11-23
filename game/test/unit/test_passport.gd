@@ -72,3 +72,20 @@ func test_photos_only_count_the_first_time() -> void:
 	assert_false(p.add_photo(""))
 	assert_signal_emit_count(p, "photographed", 1)
 	assert_eq(p.photo_count(["secret_mandi", "secret_teotonio"]), 1)
+
+
+func test_complete_needs_every_stamp_and_photo() -> void:
+	var p := Passport.new()
+	var stamps := PackedStringArray(["A", "B"])
+	var photos := PackedStringArray(["x"])
+	assert_false(p.is_complete(stamps, photos))
+	p.stamp("A")
+	p.stamp("B")
+	assert_false(p.is_complete(stamps, photos), "photos missing")
+	p.add_photo("x")
+	assert_true(p.is_complete(stamps, photos))
+
+
+func test_flags_round_trip_through_the_save() -> void:
+	var d := SaveStoreScript.decode(SaveStoreScript.encode(Passport.new(), "en", {"tutorial_seen": true}))
+	assert_eq(d.flags, {"tutorial_seen": true})

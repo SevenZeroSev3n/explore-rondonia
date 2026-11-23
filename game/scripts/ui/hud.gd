@@ -13,6 +13,8 @@ const VIEWFINDER := Vector2(240, 150)   ## screen px, centred
 
 var stamp_cities: PackedStringArray = []
 var secret_ids: PackedStringArray = []
+var landmark_ids: PackedStringArray = []          ## Madeira-Mamoré photos
+var map_attribution: PackedStringArray = []
 var catalog: PlaceCatalog
 var photo_mode := false
 ## Key-hint string shown when not in photo mode; dioramas swap it.
@@ -21,6 +23,7 @@ var keys_hint := "HUD_KEYS"
 var _root: Control
 var _counter: Label
 var _secrets_counter: Label
+var _landmarks_counter: Label
 var _key_hint: Label
 var _toast: Label
 var _prompt: Label
@@ -34,6 +37,10 @@ var _title: Label
 var _subtitle: Label
 var _rows: VBoxContainer
 var _secrets_title: Label
+var _landmarks_title: Label
+var _landmark_rows: VBoxContainer
+var _help: Button
+var _credits_button: Button
 var _secret_rows: VBoxContainer
 var _hint: Label
 var _close: Button
@@ -46,6 +53,13 @@ var _sheet_sources: Label
 var _sheet_close: Button
 var _sheet_id := ""
 
+## One-screen panels: tutorial, passport complete, credits. Each is
+## {panel, title, body, extra, button, button2} built by _build_info().
+var _tutorial := {}
+var _complete := {}
+var _credits := {}
+var _complete_pending := false   ## the last photo's sheet shows first, then "complete"
+
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -57,8 +71,9 @@ func _ready() -> void:
 	add_child(_root)
 
 	_counter = _label(_root, Vector2(6, 4))
-	_secrets_counter = _label(_root, Vector2(6, 14))
-	_key_hint = _label(_root, Vector2(6, 24))
+	_landmarks_counter = _label(_root, Vector2(6, 14))
+	_secrets_counter = _label(_root, Vector2(6, 24))
+	_key_hint = _label(_root, Vector2(6, 34))
 	_key_hint.modulate = Color(1, 1, 1, 0.7)
 
 	_lang = Button.new()
@@ -74,8 +89,8 @@ func _ready() -> void:
 	_toast = _label(_root, Vector2.ZERO)
 	# Full width under the counters, text centred: anchors + offsets, not a raw position.
 	_toast.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	_toast.offset_top = 36
-	_toast.offset_bottom = 50
+	_toast.offset_top = 48
+	_toast.offset_bottom = 62
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_toast.add_theme_font_size_override("font_size", 10)
 	_toast.modulate.a = 0.0
@@ -88,6 +103,15 @@ func _ready() -> void:
 
 	_build_panel()
 	_build_sheet()
+	_tutorial = _build_info(300)
+	_tutorial.button.pressed.connect(close_tutorial)
+	_complete = _build_info(300)
+	_complete.button.pressed.connect(func() -> void: _hide_info(_complete))
+	_complete.button2.pressed.connect(func() -> void:
+		_hide_info(_complete)
+		show_credits())
+	_credits = _build_info(320)
+	_credits.button.pressed.connect(func() -> void: _hide_info(_credits))
 	I18n.locale_changed.connect(func(_l: String) -> void: refresh())
 	SaveStore.passport.stamped.connect(func(_c: String) -> void: refresh())
 	SaveStore.passport.photographed.connect(func(_id: String) -> void: refresh())
@@ -95,6 +119,12 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	for info in [_tutorial, _complete, _credits]:
+		if info.panel.visible:
+			if event.is_action_pressed("ui_cancel"):
+				info.button.pressed.emit()
+				get_viewport().set_input_as_handled()
+			return
 	if _sheet.visible:
 		if event.is_action_pressed("ui_cancel") or event.is_action_pressed("passport"):
 			close_sheet()
@@ -129,6 +159,11 @@ func refresh() -> void:
 	var locale := I18n.current()
 	_counter.text = tr("HUD_PASSPORT") % [p.stamp_count(stamp_cities), stamp_cities.size()]
 	_secrets_counter.text = tr("HUD_SECRETS") % [p.photo_count(secret_ids), secret_ids.size()]
+	_landmarks_counter.text = tr("HUD_LANDMARKS") % [p.photo_count(landmark_ids), landmark_ids.size()]
+	_landmarks_title.text = tr("PASSPORT_LANDMARKS")
+	_help.text = tr("PASSPORT_HELP")
+	_credits_button.text = tr("PASSPORT_CREDITS")
+	_fill_infos()
 	_key_hint.text = tr("PHOTO_MODE_KEYS") if photo_mode else tr(keys_hint)
 	_lang.text = tr("LANG_TOGGLE")
 	_title.text = tr("PASSPORT_TITLE")
@@ -150,6 +185,16 @@ func refresh() -> void:
 		else:
 			row.add_child(_dim(tr("PASSPORT_NOT_YET")))
 		_rows.add_child(row)
+
+	_clear(_landmark_rows)
+	for id in landmark_ids:
+		var name_text := catalog.name_of(id, locale) if catalog else id
+		var row := _row(("[x] " if p.has_photo(id) else "[ ] ") + name_text)
+		if p.has_photo(id):
+			row.add_child(_button(tr("PASSPORT_VIEW"), func() -> void: open_sheet(id)))
+		else:
+			row.add_child(_dim(tr("PASSPORT_NOT_TAKEN")))
+		_landmark_rows.add_child(row)
 
 	_clear(_secret_rows)
 	for id in secret_ids:
@@ -201,6 +246,9 @@ func close_sheet() -> void:
 	_sheet.visible = false
 	_sheet_id = ""
 	_update_pause()
+	if _complete_pending:
+		_complete_pending = false
+		show_complete()
 
 
 func _fill_sheet(id: String) -> void:
@@ -238,7 +286,102 @@ func toast(text: String) -> void:
 # --- building blocks ------------------------------------------------------
 
 func _update_pause() -> void:
-	get_tree().paused = _panel.visible or _sheet.visible
+	var info_open := false
+	for info in [_tutorial, _complete, _credits]:
+		if not info.is_empty() and info.panel.visible:
+			info_open = true
+	get_tree().paused = _panel.visible or _sheet.visible or info_open
+	if get_tree().paused:
+		if _toast_tween:
+			_toast_tween.kill()
+		_toast.modulate.a = 0.0   # never show a toast through a panel
+
+
+# --- tutorial, passport complete, credits ---------------------------------
+
+func show_tutorial() -> void:
+	_show_info(_tutorial)
+
+
+func close_tutorial() -> void:
+	_hide_info(_tutorial)
+	SaveStore.set_flag("tutorial_seen")
+
+
+func show_complete() -> void:
+	if _sheet.visible:
+		_complete_pending = true
+		return
+	_show_info(_complete)
+
+
+func show_credits() -> void:
+	_show_info(_credits)
+
+
+func is_showing(which: String) -> bool:
+	var info: Dictionary = {"tutorial": _tutorial, "complete": _complete, "credits": _credits}[which]
+	return info.panel.visible
+
+
+func _show_info(info: Dictionary) -> void:
+	_panel.visible = false
+	_sheet.visible = false
+	for other in [_tutorial, _complete, _credits]:
+		other.panel.visible = false
+	set_photo_mode(false)
+	_fill_infos()
+	info.panel.visible = true
+	_update_pause()
+	info.button.grab_focus()
+
+
+func _hide_info(info: Dictionary) -> void:
+	info.panel.visible = false
+	_update_pause()
+
+
+func _fill_infos() -> void:
+	if _tutorial.is_empty():
+		return
+	_tutorial.title.text = tr("TUTORIAL_TITLE")
+	_tutorial.body.text = tr("TUTORIAL_BODY") + "\n\n" + tr("TUTORIAL_GOAL")
+	_tutorial.extra.text = tr("TUTORIAL_KEYS")
+	_tutorial.button.text = tr("TUTORIAL_START")
+	_tutorial.button2.visible = false
+	_complete.title.text = tr("COMPLETE_TITLE")
+	_complete.body.text = tr("COMPLETE_BODY")
+	_complete.extra.text = ""
+	_complete.button.text = tr("COMPLETE_CONTINUE")
+	_complete.button2.text = tr("PASSPORT_CREDITS")
+	_credits.title.text = tr("CREDITS_TITLE")
+	var hosts := Credits.source_hosts(catalog) if catalog else PackedStringArray()
+	_credits.body.text = "\n".join(Credits.lines(tr, map_attribution, hosts))
+	_credits.extra.text = ""
+	_credits.button.text = tr("SHEET_CLOSE")
+	_credits.button2.visible = false
+
+
+func _build_info(width: float) -> Dictionary:
+	var panel := _centred_panel(Vector2(width, 0), Vector2(-width / 2.0, -120))
+	var box := panel.get_child(0).get_child(0) as VBoxContainer
+	var title := _heading(box)
+	var body := Label.new()
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD
+	body.custom_minimum_size = Vector2(width - 16, 0)
+	box.add_child(body)
+	var extra := _dim("")
+	extra.autowrap_mode = TextServer.AUTOWRAP_WORD
+	extra.custom_minimum_size = Vector2(width - 16, 0)
+	box.add_child(extra)
+	var buttons := HBoxContainer.new()
+	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_child(buttons)
+	var button := Button.new()
+	buttons.add_child(button)
+	var button2 := Button.new()
+	buttons.add_child(button2)
+	return {"panel": panel, "title": title, "body": body, "extra": extra, "button": button, "button2": button2}
 
 
 func _build_viewfinder() -> void:
@@ -269,20 +412,40 @@ func _build_viewfinder() -> void:
 
 
 func _build_panel() -> void:
-	_panel = _centred_panel(Vector2(240, 0), Vector2(-120, -110))
+	_panel = _centred_panel(Vector2(270, 0), Vector2(-135, -128))
 	var box := _panel.get_child(0).get_child(0) as VBoxContainer
 	_title = _heading(box)
+	# The lists scroll; title and buttons stay put, so the panel fits 270 px with any content.
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0, 150)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	box.add_child(scroll)
+	var lists := VBoxContainer.new()
+	lists.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lists.add_theme_constant_override("separation", 2)
+	scroll.add_child(lists)
 	_subtitle = Label.new()
-	box.add_child(_subtitle)
+	lists.add_child(_subtitle)
 	_rows = VBoxContainer.new()
-	box.add_child(_rows)
+	lists.add_child(_rows)
+	_landmarks_title = Label.new()
+	lists.add_child(_landmarks_title)
+	_landmark_rows = VBoxContainer.new()
+	lists.add_child(_landmark_rows)
 	_secrets_title = Label.new()
-	box.add_child(_secrets_title)
+	lists.add_child(_secrets_title)
 	_secret_rows = VBoxContainer.new()
-	box.add_child(_secret_rows)
+	lists.add_child(_secret_rows)
 	_hint = _dim("")
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD
 	box.add_child(_hint)
+	var extras := HBoxContainer.new()
+	box.add_child(extras)
+	_help = _button("", func() -> void: show_tutorial())
+	extras.add_child(_help)
+	_credits_button = _button("", func() -> void: show_credits())
+	extras.add_child(_credits_button)
 	_close = Button.new()
 	_close.pressed.connect(toggle_panel)
 	box.add_child(_close)

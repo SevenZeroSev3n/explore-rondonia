@@ -62,12 +62,18 @@ func _ready() -> void:
 	_place_spot_markers()
 	hud.stamp_cities = map.stamp_cities()
 	hud.secret_ids = catalog.ids_of_kind("secret")
+	hud.landmark_ids = catalog.ids_in_diorama("efmm")
+	hud.map_attribution = map.attribution
+	SaveStore.passport.stamped.connect(func(_c: String) -> void: check_complete())
+	SaveStore.passport.photographed.connect(func(_id: String) -> void: check_complete())
 	hud.catalog = catalog
 	hud.teleport_requested.connect(teleport_to)
 	hud.shutter_pressed.connect(take_photo)
 	hud.refresh()
 	truck.position = map.road[0]
 	truck.model.heading = map.road_heading(0)
+	if not SaveStore.has_flag("tutorial_seen"):
+		hud.show_tutorial.call_deferred()
 
 
 func _process(_delta: float) -> void:
@@ -90,6 +96,19 @@ func _unhandled_input(event: InputEvent) -> void:
 	if diorama == null and event.is_action_pressed("interact") and near_diorama():
 		get_viewport().set_input_as_handled()
 		enter_diorama()
+
+
+## ADR 0008 ending: 4 stamps + 4 Madeira-Mamoré photos + the 3 secrets. Shown once;
+## afterwards the credits stay in the passport panel.
+func check_complete() -> bool:
+	var photos := catalog.ids_in_diorama("efmm")
+	photos.append_array(catalog.ids_of_kind("secret"))
+	if not SaveStore.passport.is_complete(map.stamp_cities(), photos):
+		return false
+	if not SaveStore.has_flag("completion_seen"):
+		SaveStore.set_flag("completion_seen")
+		hud.show_complete.call_deferred()
+	return true
 
 
 func near_diorama() -> bool:

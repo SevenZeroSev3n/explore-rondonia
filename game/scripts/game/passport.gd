@@ -52,6 +52,12 @@ func stamp_count(required: PackedStringArray) -> int:
 	return n
 
 
+## True when every required stamp and photo is in (ADR 0008: the MVP ending).
+func is_complete(required_stamps: PackedStringArray, required_photos: PackedStringArray) -> bool:
+	return stamp_count(required_stamps) == required_stamps.size() \
+		and photo_count(required_photos) == required_photos.size()
+
+
 func to_dict() -> Dictionary:
 	return {"stamps": Array(stamps), "photos": Array(photos)}
 

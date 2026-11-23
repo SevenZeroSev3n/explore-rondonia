@@ -3,11 +3,15 @@ extends GutTest
 ## turning camera, leave. Swaps in a throwaway Passport so the save is untouched.
 
 var _saved_passport: Passport
+var _saved_flags: Dictionary
 var world: Node
 
 
 func before_each() -> void:
 	_saved_passport = SaveStore.passport
+	_saved_flags = SaveStore.flags
+	SaveStore.persist = false
+	SaveStore.flags = {"tutorial_seen": true}
 	SaveStore.passport = Passport.new()
 	world = load("res://scenes/main.tscn").instantiate()
 	add_child_autofree(world)
@@ -19,6 +23,8 @@ func after_each() -> void:
 		world.exit_diorama()
 	get_tree().paused = false
 	SaveStore.passport = _saved_passport
+	SaveStore.flags = _saved_flags
+	SaveStore.persist = true
 
 
 func _enter() -> Diorama:
