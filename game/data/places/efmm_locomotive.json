@@ -1,0 +1,34 @@
+{
+  "id": "efmm_locomotive",
+  "kind": "landmark",
+  "layer": 2,
+  "diorama": "efmm",
+  "name": {
+    "en": "Madeira-Mamoré locomotive",
+    "pt_BR": "Locomotiva da Madeira-Mamoré"
+  },
+  "text": {
+    "en": "The Madeira-Mamoré Railway was built between 1907 and 1912 to link Porto Velho to Guajará-Mirim, about 366 km away, as part of the Treaty of Petrópolis with Bolivia. Thousands of workers died of malaria, yellow fever and other diseases, and it became known as the \"Devil's Railway\". It was shut down in the early 1970s.",
+    "pt_BR": "A Estrada de Ferro Madeira-Mamoré foi construída entre 1907 e 1912 para ligar Porto Velho a Guajará-Mirim, a cerca de 366 km, como parte do Tratado de Petrópolis com a Bolívia. Milhares de trabalhadores morreram de malária, febre amarela e outras doenças, e ela ficou conhecida como \"Ferrovia do Diabo\". Foi desativada no início dos anos 1970."
+  },
+  "diorama_layout": {
+    "stack": "locomotive",
+    "local_pos": [
+      -60,
+      -40
+    ],
+    "facing_deg": 90,
+    "view_from_deg": 180
+  },
+  "photo_rules": {
+    "radius_px": 22,
+    "max_distance_px": 110,
+    "window_half_deg": 30
+  },
+  "photos": [],
+  "sources": [
+    "https://en.wikipedia.org/wiki/Madeira-Mamor%C3%A9_Railroad",
+    "https://portalamazonia.com/amazonia-de-a-a-z/estrada-de-ferro-madeira-mamore/",
+    "https://www.correiobraziliense.com.br/cbradar/a-capital-que-nasceu-de-uma-ferrovia-a-cidade-construida-as-margens-do-rio-madeira-em-torno-da-lendaria-ferrovia-do-diabo/"
+  ]
+}

@@ -15,12 +15,15 @@ var stamp_cities: PackedStringArray = []
 var secret_ids: PackedStringArray = []
 var catalog: PlaceCatalog
 var photo_mode := false
+## Key-hint string shown when not in photo mode; dioramas swap it.
+var keys_hint := "HUD_KEYS"
 
 var _root: Control
 var _counter: Label
 var _secrets_counter: Label
 var _key_hint: Label
 var _toast: Label
+var _prompt: Label
 var _toast_tween: Tween
 var _lang: Button
 var _viewfinder: Control
@@ -77,6 +80,12 @@ func _ready() -> void:
 	_toast.add_theme_font_size_override("font_size", 10)
 	_toast.modulate.a = 0.0
 
+	_prompt = _label(_root, Vector2.ZERO)
+	_prompt.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_prompt.offset_top = -22
+	_prompt.offset_bottom = -8
+	_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
 	_build_panel()
 	_build_sheet()
 	I18n.locale_changed.connect(func(_l: String) -> void: refresh())
@@ -120,7 +129,7 @@ func refresh() -> void:
 	var locale := I18n.current()
 	_counter.text = tr("HUD_PASSPORT") % [p.stamp_count(stamp_cities), stamp_cities.size()]
 	_secrets_counter.text = tr("HUD_SECRETS") % [p.photo_count(secret_ids), secret_ids.size()]
-	_key_hint.text = tr("PHOTO_MODE_KEYS") if photo_mode else tr("HUD_KEYS")
+	_key_hint.text = tr("PHOTO_MODE_KEYS") if photo_mode else tr(keys_hint)
 	_lang.text = tr("LANG_TOGGLE")
 	_title.text = tr("PASSPORT_TITLE")
 	_subtitle.text = tr("PASSPORT_STAMPS")
@@ -207,7 +216,14 @@ func _fill_sheet(id: String) -> void:
 	_sheet_sources.text = tr("SHEET_SOURCES") % ", ".join(hosts)
 
 
-# --- toasts ---------------------------------------------------------------
+# --- toasts and prompts ---------------------------------------------------
+
+## A standing hint at the bottom of the screen ("Enter: ..."); empty hides it.
+func set_prompt(text: String) -> void:
+	if _prompt.text != text:
+		_prompt.text = text
+
+
 
 func toast(text: String) -> void:
 	_toast.text = text

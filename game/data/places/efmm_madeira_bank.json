@@ -1,0 +1,33 @@
+{
+  "id": "efmm_madeira_bank",
+  "kind": "landmark",
+  "layer": 2,
+  "diorama": "efmm",
+  "name": {
+    "en": "Bank of the Madeira river",
+    "pt_BR": "Margem do rio Madeira"
+  },
+  "text": {
+    "en": "Before the road, the Madeira river was the road: people and cargo arrived by water. The railway was built to get around the rapids that blocked boats travelling further up the Madeira and Mamoré rivers.",
+    "pt_BR": "Antes da estrada, o rio Madeira era a estrada: pessoas e cargas chegavam pela água. A ferrovia foi construída para contornar as cachoeiras que impediam os barcos de seguir rio acima pelo Madeira e pelo Mamoré."
+  },
+  "diorama_layout": {
+    "stack": null,
+    "local_pos": [
+      20,
+      -112
+    ],
+    "facing_deg": 0,
+    "view_from_deg": 180
+  },
+  "photo_rules": {
+    "radius_px": 16,
+    "max_distance_px": 90,
+    "window_half_deg": 30
+  },
+  "photos": [],
+  "sources": [
+    "https://en.wikipedia.org/wiki/Madeira-Mamor%C3%A9_Railroad",
+    "https://portalamazonia.com/amazonia-de-a-a-z/estrada-de-ferro-madeira-mamore/"
+  ]
+}

@@ -48,6 +48,19 @@ func sources_of(id: String) -> PackedStringArray:
 	return PackedStringArray(places.get(id, {}).get("sources", []))
 
 
+func ids_in_diorama(diorama: String) -> PackedStringArray:
+	var out: PackedStringArray = []
+	for id in places:
+		if places[id].get("diorama", "") == diorama:
+			out.append(id)
+	out.sort()
+	return out
+
+
+func layout_of(id: String) -> Dictionary:
+	return places.get(id, {}).get("diorama_layout", {})
+
+
 ## Photo rules merged with the spot's position and side from the state map.
 func spot_for(id: String, pos: Vector2, view_from_deg: float) -> Dictionary:
 	var rules: Dictionary = places.get(id, {}).get("photo_rules", {})

@@ -11,7 +11,6 @@
   "HUD_SECRETS": {"en": "Secrets %d/%d", "pt_BR": "Segredos %d/%d"},
   "HUD_KEYS": {"en": "P: passport · F: camera", "pt_BR": "P: passaporte · F: câmera"},
   "PHOTO_MODE_KEYS": {"en": "Space: shoot · F/Esc: put the camera away", "pt_BR": "Espaço: fotografar · F/Esc: guardar a câmera"},
-  "PHOTO_SAVED": {"en": "New photo: %s", "pt_BR": "Foto nova: %s"},
   "PHOTO_ALREADY": {"en": "Already in your passport: %s", "pt_BR": "Já está no seu passaporte: %s"},
   "PHOTO_HINT_FRAME": {"en": "Fit all of it inside the frame.", "pt_BR": "Enquadre inteiro."},
   "PHOTO_HINT_CLOSER": {"en": "Get a little closer.", "pt_BR": "Chegue um pouco mais perto."},
@@ -21,5 +20,9 @@
   "PASSPORT_VIEW": {"en": "View", "pt_BR": "Ver"},
   "SHEET_PHOTO_SOON": {"en": "[ real photo coming soon ]", "pt_BR": "[ foto real em breve ]"},
   "SHEET_SOURCES": {"en": "Sources: %s", "pt_BR": "Fontes: %s"},
-  "SHEET_CLOSE": {"en": "Close", "pt_BR": "Fechar"}
+  "SHEET_CLOSE": {"en": "Close", "pt_BR": "Fechar"},
+  "ENTER_DIORAMA": {"en": "Enter: explore the Madeira-Mamoré Railway", "pt_BR": "Enter: explorar a Estrada de Ferro Madeira-Mamoré"},
+  "EXIT_DIORAMA": {"en": "Enter: back to the road", "pt_BR": "Enter: voltar para a estrada"},
+  "DIORAMA_KEYS": {"en": "WASD: walk · Q/E: turn the view · F: camera · P: passport", "pt_BR": "WASD: andar · Q/E: girar a vista · F: câmera · P: passaporte"},
+  "DIORAMA_WELCOME": {"en": "Madeira-Mamoré Railway, Porto Velho", "pt_BR": "Estrada de Ferro Madeira-Mamoré, Porto Velho"}
 }

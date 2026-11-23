@@ -26,5 +26,8 @@ stacking (the rotating vehicle).
 ## Consequences
 
 - Layer transitions are part of the MVP and get tested early.
+- Implementation notes (2026-11-23): the state map stays loaded but hidden and frozen while a
+  diorama is open, so the truck is exactly where it was parked; the diorama camera looks 40 px
+  ahead of the traveler so what you face sits inside the viewfinder.
 - Out of the MVP: day/night, weather, traffic/NPCs, story missions, other highways. The passport
   and photo goals of ADR 0008 are in.

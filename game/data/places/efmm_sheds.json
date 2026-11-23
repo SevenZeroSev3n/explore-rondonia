@@ -1,0 +1,33 @@
+{
+  "id": "efmm_sheds",
+  "kind": "landmark",
+  "layer": 2,
+  "diorama": "efmm",
+  "name": {
+    "en": "Railway sheds",
+    "pt_BR": "Galpões da ferrovia"
+  },
+  "text": {
+    "en": "The sheds and workshops of the railway yard, next to the old station, are part of the Madeira-Mamoré complex listed by Iphan. Porto Velho was born around this yard, on the bank of the Madeira river.",
+    "pt_BR": "Os galpões e oficinas do pátio da ferrovia, junto à antiga estação, fazem parte do complexo da Madeira-Mamoré tombado pelo Iphan. Porto Velho nasceu em volta desse pátio, à beira do rio Madeira."
+  },
+  "diorama_layout": {
+    "stack": "shed",
+    "local_pos": [
+      130,
+      -78
+    ],
+    "facing_deg": 0,
+    "view_from_deg": 180
+  },
+  "photo_rules": {
+    "radius_px": 34,
+    "max_distance_px": 120,
+    "window_half_deg": 30
+  },
+  "photos": [],
+  "sources": [
+    "https://portalamazonia.com/amazonia-de-a-a-z/estrada-de-ferro-madeira-mamore/",
+    "https://www.correiobraziliense.com.br/cbradar/a-capital-que-nasceu-de-uma-ferrovia-a-cidade-construida-as-margens-do-rio-madeira-em-torno-da-lendaria-ferrovia-do-diabo/"
+  ]
+}

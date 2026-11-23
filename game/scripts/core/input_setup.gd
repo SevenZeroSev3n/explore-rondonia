@@ -14,6 +14,9 @@ func _enter_tree() -> void:
 	_action("passport", [_key(KEY_P), _key(KEY_TAB), _button(JOY_BUTTON_Y)])
 	_action("photo", [_key(KEY_F), _button(JOY_BUTTON_X)])
 	_action("shoot", [_key(KEY_SPACE), _button(JOY_BUTTON_RIGHT_SHOULDER)])
+	_action("interact", [_key(KEY_ENTER), _key(KEY_KP_ENTER), _button(JOY_BUTTON_LEFT_SHOULDER)])
+	_action("rotate_view_left", [_key(KEY_Q), _axis(JOY_AXIS_RIGHT_X, -1.0)])
+	_action("rotate_view_right", [_key(KEY_E), _axis(JOY_AXIS_RIGHT_X, 1.0)])
 
 
 func _action(action_name: StringName, events: Array) -> void:

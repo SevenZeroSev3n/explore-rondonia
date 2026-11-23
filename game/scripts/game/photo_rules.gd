@@ -12,13 +12,32 @@ enum Result { OK, NOT_IN_FRAME, TOO_FAR, WRONG_ANGLE }
 static func evaluate(spot: Dictionary, frame: Rect2, viewer: Vector2) -> Result:
 	var pos: Vector2 = spot.pos
 	var r: float = spot.radius
-	if not frame.encloses(Rect2(pos - Vector2(r, r), Vector2(r, r) * 2.0)):
+	var in_frame := frame.encloses(Rect2(pos - Vector2(r, r), Vector2(r, r) * 2.0))
+	return judge(spot, in_frame, viewer.distance_to(pos), angle_off(spot, viewer))
+
+
+## The rule itself, once each measurement is known. Layer 1 measures in world space
+## (north-up, the viewer is the truck); dioramas measure the frame on screen and the
+## angle from the rotating camera (see eye_bearing_deg).
+static func judge(spot: Dictionary, in_frame: bool, distance: float, off_deg: float) -> Result:
+	if not in_frame:
 		return Result.NOT_IN_FRAME
-	if viewer.distance_to(pos) > spot.max_distance:
+	if distance > spot.max_distance:
 		return Result.TOO_FAR
-	if angle_off(spot, viewer) > spot.window_half_deg:
+	if off_deg > spot.window_half_deg:
 		return Result.WRONG_ANGLE
 	return Result.OK
+
+
+## Compass bearing (0 = north) of the side the camera looks from: the bottom of the
+## screen, for a Camera2D rotated by camera_rotation.
+static func eye_bearing_deg(camera_rotation: float) -> float:
+	var down := Vector2(0, 1).rotated(camera_rotation)
+	return fposmod(rad_to_deg(atan2(down.x, -down.y)), 360.0)
+
+
+static func bearing_off(spot: Dictionary, bearing_deg: float) -> float:
+	return absf(wrapf(bearing_deg - spot.view_from_deg, -180.0, 180.0))
 
 
 ## Degrees between where the viewer stands (seen from the spot) and the spot's ideal side.

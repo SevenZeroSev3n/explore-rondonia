@@ -14,6 +14,9 @@ const TREES_PER_CHUNK := 18
 const WORLD_SEED := 364
 const STAMP_RADIUS := 70.0
 const SPOT_REVEAL_DISTANCE := 500.0   ## secrets show a glint only when you are near
+const DIORAMA_SCENE := preload("res://scenes/diorama_efmm.tscn")
+const DIORAMA_TOWN := "Porto Velho"
+const DIORAMA_ENTER_RADIUS := 110.0
 
 const PASTURE := Color("4e7a40")
 const OUTSIDE := Color("2f4a2c")
@@ -30,6 +33,7 @@ var road_index: PolylineIndex
 var river_index: PolylineIndex
 var _chunks: Dictionary = {}     ## Vector2i -> Array[Node]
 var _last_chunk := Vector2i(1 << 30, 1 << 30)
+var diorama: Diorama                  ## the active layer-2 scene, or null on the state map
 
 @onready var ground: Node2D = $Ground
 @onready var entities: Node2D = $Entities
@@ -72,6 +76,7 @@ func _process(_delta: float) -> void:
 	for city in Passport.cities_in_reach(map.towns, truck.position, STAMP_RADIUS):
 		if SaveStore.passport.stamp(city):
 			hud.toast(tr("STAMP_TOAST") % city)
+	hud.set_prompt(tr("ENTER_DIORAMA") if near_diorama() else "")
 	for id in _spot_markers:
 		var m: Node2D = _spot_markers[id]
 		m.visible = truck.position.distance_to(m.position) < SPOT_REVEAL_DISTANCE
@@ -81,20 +86,79 @@ func _process(_delta: float) -> void:
 		_stream_chunks(c)
 
 
-## Judges a photo taken through the viewfinder (screen rect) from where the truck is.
+func _unhandled_input(event: InputEvent) -> void:
+	if diorama == null and event.is_action_pressed("interact") and near_diorama():
+		get_viewport().set_input_as_handled()
+		enter_diorama()
+
+
+func near_diorama() -> bool:
+	var t := map.town(DIORAMA_TOWN)
+	return not t.is_empty() and truck.position.distance_to(t.road_pos) <= DIORAMA_ENTER_RADIUS
+
+
+## Layer 1 -> layer 2: park the state map (hidden, frozen) and open the diorama.
+func enter_diorama() -> void:
+	if diorama:
+		return
+	diorama = DIORAMA_SCENE.instantiate()
+	diorama.catalog = catalog
+	diorama.hud = hud
+	diorama.exit_requested.connect(exit_diorama)
+	ground.visible = false
+	entities.visible = false
+	entities.process_mode = Node.PROCESS_MODE_DISABLED
+	set_process(false)
+	hud.set_photo_mode(false)
+	hud.keys_hint = "DIORAMA_KEYS"
+	hud.set_prompt("")
+	add_sibling(diorama)
+	hud.toast(tr("DIORAMA_WELCOME"))
+	hud.refresh()
+
+
+## Layer 2 -> layer 1: back in the truck where it was parked.
+func exit_diorama() -> void:
+	if diorama == null:
+		return
+	diorama.queue_free()
+	diorama = null
+	SpriteStack.set_view_rotation(get_tree(), 0.0)
+	ground.visible = true
+	entities.visible = true
+	entities.process_mode = Node.PROCESS_MODE_INHERIT
+	set_process(true)
+	hud.set_photo_mode(false)
+	hud.keys_hint = "HUD_KEYS"
+	hud.set_prompt("")
+	var cam: Camera2D = truck.get_node("Camera")
+	cam.make_current()
+	cam.reset_smoothing()
+	hud.refresh()
+
+
+## Judges a photo through the viewfinder (screen rect) on whichever layer is active.
 func take_photo(frame_screen: Rect2) -> PhotoRules.Result:
-	var inv := get_viewport().get_canvas_transform().affine_inverse()
-	var frame := Rect2(inv * frame_screen.position, frame_screen.size / get_viewport().get_canvas_transform().get_scale())
-	var spot := PhotoRules.pick_spot(spots, frame)
+	var spot := {}
+	var result := PhotoRules.Result.NOT_IN_FRAME
+	if diorama:
+		var shot := diorama.take_photo(frame_screen)
+		if not shot.is_empty():
+			spot = shot.spot
+			result = shot.result
+	else:
+		var inv := get_viewport().get_canvas_transform().affine_inverse()
+		var frame := Rect2(inv * frame_screen.position, frame_screen.size / get_viewport().get_canvas_transform().get_scale())
+		spot = PhotoRules.pick_spot(spots, frame)
+		if not spot.is_empty():
+			result = PhotoRules.evaluate(spot, frame, truck.position)
 	if spot.is_empty():
 		return PhotoRules.Result.NOT_IN_FRAME   # a photo of the landscape: nothing to record
-	var result := PhotoRules.evaluate(spot, frame, truck.position)
 	var title := catalog.name_of(spot.id, I18n.current())
 	if result != PhotoRules.Result.OK:
 		hud.toast(tr(PhotoRules.hint_key(result)))
 	elif SaveStore.passport.add_photo(spot.id):
-		hud.toast(tr("PHOTO_SAVED") % title)
-		hud.open_sheet(spot.id)
+		hud.open_sheet(spot.id)   # the sheet itself is the reward; no toast underneath it
 	else:
 		hud.toast(tr("PHOTO_ALREADY") % title)
 	return result

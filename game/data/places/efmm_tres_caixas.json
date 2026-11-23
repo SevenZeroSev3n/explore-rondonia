@@ -1,0 +1,48 @@
+{
+  "id": "efmm_tres_caixas",
+  "kind": "landmark",
+  "layer": 2,
+  "diorama": "efmm",
+  "name": {
+    "en": "Três Caixas d'Água (the three water towers)",
+    "pt_BR": "Três Caixas d'Água"
+  },
+  "text": {
+    "en": "The \"Três Marias\" were made by the American company Chicago Bridge & Iron Works and installed between 1910 and 1912 to supply the railway works; later they supplied the city until the 1950s. They appear on Porto Velho's flag and coat of arms. (In real life they stand in the city centre, a short walk from the railway yard.)",
+    "pt_BR": "As \"Três Marias\" foram feitas pela empresa americana Chicago Bridge & Iron Works e instaladas entre 1910 e 1912 para abastecer as obras da ferrovia; depois abasteceram a cidade até os anos 1950. Estão na bandeira e no brasão de Porto Velho. (Na vida real elas ficam no centro da cidade, a uma curta caminhada do pátio da ferrovia.)"
+  },
+  "diorama_layout": {
+    "stack": "water_tower",
+    "local_pos": [
+      -150,
+      95
+    ],
+    "facing_deg": 0,
+    "view_from_deg": 90,
+    "instances": [
+      [
+        -14,
+        -10
+      ],
+      [
+        12,
+        -6
+      ],
+      [
+        -2,
+        14
+      ]
+    ]
+  },
+  "photo_rules": {
+    "radius_px": 28,
+    "max_distance_px": 110,
+    "window_half_deg": 30
+  },
+  "photos": [],
+  "sources": [
+    "https://portalamazonia.com/rondonia/voce-sabia-que-as-tres-marias-de-porto-velho-nasceram-nos-eua/",
+    "https://portalamazonia.com/cultura/tres-caixas-d-agua-e-a-praca-no-entorno-sao-simbolos-culturais-e-patrimonio-do-estado-de-rondonia/",
+    "https://portalamazonia.com/amazonia-de-a-a-z/bandeira-de-porto-velho/"
+  ]
+}
