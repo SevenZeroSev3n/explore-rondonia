@@ -2,18 +2,20 @@
 
 *Viaje por Rondônia · Travel across Rondônia*
 
-An interactive, bilingual (pt-BR / English) map of the Brazilian state of Rondônia in
-**sprite-stacking** pixel art. Drive the real highways, reach tourist spots, and see what
-those places look like — first as a voxel-style diorama, then in real photos.
+A small cozy, bilingual (pt-BR / English) game set in the Brazilian state of Rondônia, in
+**sprite-stacking** pixel art. Drive the real highways, stamp your tourist passport, and
+photograph landmarks from the right angle to unlock what those places really look like.
 
 > Status: pre-MVP. Only the project skeleton and the architecture decisions exist.
 > Read [`CONTEXT.md`](CONTEXT.md) and the ADRs in [`docs/adr/`](docs/adr/).
 
 ## MVP
 
-The BR-364 end to end (Vilhena → Ji-Paraná → Ariquemes → Porto Velho), driven in a pickup
-truck on a stylized state map, plus one explorable diorama: the Madeira-Mamoré Railway
-complex in Porto Velho. Runs in the desktop browser (keyboard / gamepad).
+Start in Vilhena with an empty passport and drive a pickup truck up BR-364 on a stylized state
+map (Vilhena → Ji-Paraná → Ariquemes → Porto Velho), plus one explorable diorama: the Madeira-Mamoré Railway
+complex in Porto Velho, explored on foot. Collect 4 city stamps, 4 landmark photos and 2–3 real
+roadside secrets to complete the passport (30–45 min). Desktop browser (keyboard / gamepad),
+released on itch.io.
 
 ## Layout
 

@@ -17,6 +17,7 @@ file exists, check with `git ls-files`.
 | Map, camera, layers, scale | `docs/adr/0002-two-map-layers.md`, `docs/adr/0003-geodata-pipeline.md` |
 | Art assets | `docs/adr/0004-art-pipeline-ai-plus-procedural.md`, `docs/adr/0005-visual-style.md` |
 | Place sheets, text, photos, i18n | `docs/adr/0006-content-as-bilingual-data.md` |
+| Game loop, passport, photo mode, secrets | `docs/adr/0008-cozy-passport-game-loop.md` |
 | CI, hosting, tests | `docs/adr/0007-repo-ci-hosting-tests.md` |
 
 ## Rules

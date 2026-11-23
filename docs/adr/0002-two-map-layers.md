@@ -2,6 +2,7 @@
 
 - Status: accepted
 - Date: 2026-11-23
+- Amended by: ADR 0008 (game loop; missions-like goals are now in scope)
 
 ## Context
 
@@ -25,4 +26,5 @@ stacking (the rotating vehicle).
 ## Consequences
 
 - Layer transitions are part of the MVP and get tested early.
-- Out of the MVP: day/night, weather, traffic/NPCs, missions, other highways.
+- Out of the MVP: day/night, weather, traffic/NPCs, story missions, other highways. The passport
+  and photo goals of ADR 0008 are in.
