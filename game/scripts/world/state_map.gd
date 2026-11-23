@@ -2,15 +2,18 @@ extends Node2D
 ## Layer 1: the whole state, from game/data/geo/state_map.json (ADR 0002/0003).
 ## North-up; trees are streamed in chunks around the truck.
 
-const TREE_SHEET := preload("res://assets/stacks/tree/tree_slices.png")
-const TREE_SLICES := 26
 const ASPHALT_HALF_WIDTH := 13.0
 const SHOULDER_HALF_WIDTH := 18.0
 const ROAD_TREE_CLEARANCE := 44.0
 const RIVER_HALF_WIDTH := 3.0
 const CHUNK_SIZE := 384.0
 const CHUNK_RADIUS := 1          ## chunks kept around the truck's chunk in each direction
-const TREES_PER_CHUNK := 18
+const TREES_PER_CHUNK := 300
+const SHRUBS_PER_CHUNK := 130
+## Planting and clearing are spread over frames so crossing a chunk border never
+## stalls a frame (hundreds of stacks per chunk; the web build is slower than native).
+const PLANTS_PER_FRAME := 90
+const CLEARS_PER_FRAME := 200
 const WORLD_SEED := 364
 const STAMP_RADIUS := 70.0
 const SPOT_REVEAL_DISTANCE := 500.0   ## secrets show a glint only when you are near
@@ -32,6 +35,10 @@ var _spot_markers: Dictionary = {}    ## id -> Node2D
 var road_index: PolylineIndex
 var river_index: PolylineIndex
 var _chunks: Dictionary = {}     ## Vector2i -> Array[Node]
+var forest := Forest.new(WORLD_SEED)
+var _sheets: Dictionary = {}     ## species -> Texture2D
+var _to_plant: Array = []        ## [chunk, candidate, is_shrub], nearest chunks first
+var _to_clear: Array[Node] = []
 var _last_chunk := Vector2i(1 << 30, 1 << 30)
 var diorama: Diorama                  ## the active layer-2 scene, or null on the state map
 
@@ -90,6 +97,7 @@ func _process(_delta: float) -> void:
 	if c != _last_chunk:
 		_last_chunk = c
 		_stream_chunks(c)
+	_work_queues()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -274,29 +282,73 @@ func _stream_chunks(center: Vector2i) -> void:
 			wanted[center + Vector2i(dx, dy)] = true
 	for c in _chunks.keys():
 		if not wanted.has(c):
-			for n: Node in _chunks[c]:
-				n.queue_free()
+			_to_clear.append_array(_chunks[c])
 			_chunks.erase(c)
-	for c in wanted:
-		if not _chunks.has(c):
-			_chunks[c] = _build_chunk(c)
+	_to_plant = _to_plant.filter(func(job): return wanted.has(job[0]))
+	var fresh: Array = wanted.keys().filter(func(c): return not _chunks.has(c))
+	fresh.sort_custom(func(a, b): return (a - center).length_squared() < (b - center).length_squared())
+	for c in fresh:
+		_chunks[c] = [] as Array[Node]
+		for cand in TreeScatter.candidates(c, CHUNK_SIZE, TREES_PER_CHUNK, WORLD_SEED):
+			_to_plant.append([c, cand, false])
+		for cand in TreeScatter.candidates(c, CHUNK_SIZE, SHRUBS_PER_CHUNK, WORLD_SEED + 1):
+			_to_plant.append([c, cand, true])
 
 
-func _build_chunk(c: Vector2i) -> Array[Node]:
-	var nodes: Array[Node] = []
-	for cand in TreeScatter.candidates(c, CHUNK_SIZE, TREES_PER_CHUNK, WORLD_SEED):
-		var p: Vector2 = cand.pos
-		if not is_inside_state(p):
+## Plants and clears a bounded amount each frame.
+func _work_queues(plant_budget: int = PLANTS_PER_FRAME) -> void:
+	var cleared := 0
+	while not _to_clear.is_empty() and cleared < CLEARS_PER_FRAME:
+		var n: Node = _to_clear.pop_back()
+		if is_instance_valid(n):
+			n.queue_free()
+		cleared += 1
+	var planted := 0
+	while not _to_plant.is_empty() and planted < plant_budget:
+		var job: Array = _to_plant.pop_front()
+		planted += 1
+		if not _chunks.has(job[0]):
 			continue
-		if road_index.distance_within(p, ROAD_TREE_CLEARANCE) < INF:
+		var cand: Dictionary = job[1]
+		var h: Variant = _habitat_at(cand.pos)
+		if h == null:
 			continue
-		if river_index.distance_within(p, RIVER_HALF_WIDTH + 8.0) < INF:
-			continue
-		var tree := SpriteStack.new()
-		tree.sheet = TREE_SHEET
-		tree.slice_count = TREE_SLICES
-		tree.angle = cand.angle
-		tree.position = p
-		entities.add_child(tree)
-		nodes.append(tree)
-	return nodes
+		var species := ""
+		if job[2]:
+			species = "shrub" if forest.shrub_at(h, cand.pos, cand.keep) else ""
+		else:
+			species = forest.tree_at(h, cand.pos, cand.keep, cand.species)
+		if not species.is_empty():
+			_chunks[job[0]].append(_plant(species, cand))
+
+
+## Builds every queued chunk now (tests and teleports).
+func flush_forest() -> void:
+	while not _to_plant.is_empty() or not _to_clear.is_empty():
+		_work_queues(1 << 30)
+
+
+## Forest habitat at p, or null where nothing may grow (outside the state, on the
+## road and its shoulders, in a river).
+func _habitat_at(p: Vector2) -> Variant:
+	if not is_inside_state(p):
+		return null
+	var road_d := road_index.distance_within(p, Forest.PASTURE_DISTANCE)
+	if road_d < ROAD_TREE_CLEARANCE:
+		return null
+	var river_d := river_index.distance_within(p, Forest.RIVERSIDE_DISTANCE)
+	if river_d < RIVER_HALF_WIDTH + 8.0:
+		return null
+	return Forest.habitat(road_d, river_d)
+
+
+func _plant(species: String, cand: Dictionary) -> SpriteStack:
+	if not _sheets.has(species):
+		_sheets[species] = load("res://assets/stacks/%s/%s_slices.png" % [species, species])
+	var s := SpriteStack.new()
+	s.sheet = _sheets[species]
+	s.slice_count = Forest.SLICES[species]
+	s.angle = cand.angle
+	s.position = cand.pos
+	entities.add_child(s)
+	return s

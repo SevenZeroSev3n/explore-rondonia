@@ -1,7 +1,7 @@
 """Build every game slice sheet (ADR 0004).
 
 For each stack in STACKS: if art/views/<name>_views.png exists (a 2x2 four-view sheet from any
-image generator, see art/views/README.md), carve it with views_to_slices; otherwise fall back to
+image generator, see art/views/00-workflow.md), carve it with views_to_slices; otherwise fall back to
 the code-drawn placeholder from make_placeholder_stacks. Sizes and slice counts are the contract
 with the game (scenes and scripts hard-code the slice counts), so both routes use the same ones.
 
@@ -27,7 +27,13 @@ OUT = ROOT / "game/assets/stacks"
 # name: (W, L, H, palette colours). L is the length along the facing direction.
 STACKS = {
     "truck": (20, 36, 9, 16),
-    "tree": (24, 24, 26, 12),
+    "castanheira": (24, 24, 26, 12),
+    "seringueira": (20, 20, 20, 12),
+    "acai": (12, 12, 24, 8),
+    "buriti": (18, 18, 24, 8),
+    "ipe": (20, 20, 20, 8),
+    "embauba": (16, 16, 18, 8),
+    "shrub": (10, 10, 6, 6),
     "traveler": (8, 8, 14, 8),
     "locomotive": (18, 40, 17, 12),
     "shed": (64, 36, 20, 12),

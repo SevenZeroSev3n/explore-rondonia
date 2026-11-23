@@ -110,8 +110,8 @@ def pickup_slices() -> list[Image.Image]:
     return slices
 
 
-def tree_slices(seed: int = 7) -> list[Image.Image]:
-    """A tall Amazonian tree (castanheira-like): long trunk, wide flat crown. 24x24, 26 slices."""
+def castanheira_slices(seed: int = 7) -> list[Image.Image]:
+    """Brazil-nut tree (castanheira): long straight trunk, wide flat crown. 24x24, 26 slices."""
     w = h = 24
     cx = cy = (w - 1) / 2
     rng = random.Random(seed)
@@ -259,6 +259,135 @@ def water_tower_slices() -> list[Image.Image]:
     return out
 
 
+BARK_LIGHT = (150, 140, 124, 255)
+BARK_PALE = (214, 208, 192, 255)
+PALM = [(58, 98, 52, 255), (78, 122, 60, 255), (104, 146, 70, 255)]
+IPE = [(201, 154, 30, 255), (232, 195, 58, 255), (242, 214, 90, 255)]
+EMBAUBA = [(111, 143, 116, 255), (159, 184, 160, 255)]
+SHRUB = [(40, 78, 44, 255), (56, 98, 52, 255), (72, 116, 58, 255)]
+
+
+def _trunk(s: Image.Image, cx: int, cy: int, size: int, color: RGBA) -> None:
+    rect(s, cx, cy, cx + size - 1, cy + size - 1, color)
+
+
+def _blob(s: Image.Image, cx: float, cy: float, r: float, colors, rng: random.Random, t: float) -> None:
+    """Rough disc: leafy noise on the edge, lighter towards the top (t = 0 bottom .. 1 top)."""
+    w, h = s.size
+    for y in range(h):
+        for x in range(w):
+            if math.hypot(x - cx, y - cy) <= r - rng.random() * 1.2:
+                shade = min(len(colors) - 1, int(t * len(colors) + rng.random() * 1.2))
+                s.putpixel((x, y), colors[shade])
+
+
+def seringueira_slices(seed: int = 11) -> list[Image.Image]:
+    """Rubber tree (seringueira): pale trunk, dense rounded crown. 20x20, 20 slices."""
+    rng = random.Random(seed)
+    out = []
+    for z in range(20):
+        s = blank(20, 20)
+        if z <= 9:
+            _trunk(s, 9, 9, 2, BARK_LIGHT)
+        if z >= 6:
+            t = (z - 6) / 13
+            _blob(s, 9.5, 9.5, 9.0 * math.sqrt(max(0.0, 1 - (2 * t - 0.9) ** 2)), LEAF, rng, t)
+        out.append(s)
+    return out
+
+
+def acai_slices(seed: int = 13) -> list[Image.Image]:
+    """Açaí palm: very slender trunk, a small crown of drooping feather fronds. 12x12, 24 slices."""
+    out = []
+    for z in range(24):
+        s = blank(12, 12)
+        if z <= 19:
+            s.putpixel((5, 5), (120, 124, 104, 255))
+        if z >= 17:
+            reach = {17: 5, 18: 5, 19: 5, 20: 4, 21: 3, 22: 2, 23: 1}[z]
+            inner = 3 if z <= 18 else 0          # lower fronds droop: only their tips this low
+            for k in range(8):
+                a = k * math.pi / 4 + 0.2
+                for r in range(inner, reach + 1):
+                    x, y = int(round(5.5 + math.cos(a) * r)), int(round(5.5 + math.sin(a) * r))
+                    if 0 <= x < 12 and 0 <= y < 12:
+                        s.putpixel((x, y), PALM[min(2, (z - 17) // 2)])
+        out.append(s)
+    return out
+
+
+def buriti_slices(seed: int = 17) -> list[Image.Image]:
+    """Buriti palm: thick trunk, round crown of fan leaves. 18x18, 24 slices."""
+    out = []
+    for z in range(24):
+        s = blank(18, 18)
+        if z <= 16:
+            _trunk(s, 8, 8, 2, (112, 96, 76, 255))
+        if z >= 15:
+            t = (z - 15) / 8
+            r = 8.0 * math.sqrt(max(0.0, 1 - (2 * t - 0.7) ** 2))
+            for y in range(18):
+                for x in range(18):
+                    d = math.hypot(x - 8.5, y - 8.5)
+                    a = math.atan2(y - 8.5, x - 8.5)
+                    if d <= r and (math.sin(a * 9) > -0.3 or d < r * 0.5):   # fan-leaf points
+                        s.putpixel((x, y), PALM[min(2, int(t * 3))])
+        out.append(s)
+    return out
+
+
+def ipe_slices(seed: int = 19) -> list[Image.Image]:
+    """Yellow ipê in bloom (dry season): dark trunk, airy crown of yellow flowers. 20x20, 20 slices."""
+    rng = random.Random(seed)
+    out = []
+    for z in range(20):
+        s = blank(20, 20)
+        if z <= 10:
+            _trunk(s, 9, 9, 2, TRUNK_DARK)
+        if z >= 8:
+            t = (z - 8) / 11
+            r = 8.5 * math.sqrt(max(0.0, 1 - (2 * t - 0.8) ** 2))
+            for y in range(20):
+                for x in range(20):
+                    if math.hypot(x - 9.5, y - 9.5) <= r and rng.random() < 0.7:   # airy, leafless
+                        s.putpixel((x, y), IPE[min(2, int(t * 3 + rng.random()))])
+        out.append(s)
+    return out
+
+
+def embauba_slices(seed: int = 23) -> list[Image.Image]:
+    """Embaúba (Cecropia): thin pale trunk, candelabra branches, flat umbrella of big silvery leaves.
+    16x16, 18 slices."""
+    rng = random.Random(seed)
+    tips = [(3, 4), (12, 3), (4, 12), (12, 12), (8, 7)]
+    out = []
+    for z in range(18):
+        s = blank(16, 16)
+        if z <= 12:
+            s.putpixel((7, 7), BARK_PALE)
+        if 10 <= z <= 13:                        # branches climbing out to the tips
+            f = (z - 10) / 3
+            for tx, ty in tips:
+                s.putpixel((int(7 + (tx - 7) * f), int(7 + (ty - 7) * f)), BARK_PALE)
+        if z >= 14:
+            for tx, ty in tips:
+                _blob(s, tx, ty, 3.0 - (z - 14) * 0.6, EMBAUBA, rng, (z - 14) / 3)
+        out.append(s)
+    return out
+
+
+def shrub_slices(seed: int = 29) -> list[Image.Image]:
+    """Undergrowth bush. 10x10, 6 slices."""
+    rng = random.Random(seed)
+    out = []
+    for z in range(6):
+        s = blank(10, 10)
+        t = z / 5
+        _blob(s, 4.5, 4.5, 4.5 * math.sqrt(max(0.0, 1 - t * t * 0.9)), SHRUB, rng, t)
+        out.append(s)
+    return out
+
+
 def to_sheet(slices: list[Image.Image]) -> Image.Image:
     w, h = slices[0].size
     sheet = Image.new("RGBA", (w * len(slices), h), CLEAR)
@@ -271,7 +400,13 @@ def to_sheet(slices: list[Image.Image]) -> Image.Image:
 
 STACKS = {
     "truck": pickup_slices,
-    "tree": tree_slices,
+    "castanheira": castanheira_slices,
+    "seringueira": seringueira_slices,
+    "acai": acai_slices,
+    "buriti": buriti_slices,
+    "ipe": ipe_slices,
+    "embauba": embauba_slices,
+    "shrub": shrub_slices,
     "traveler": traveler_slices,
     "locomotive": locomotive_slices,
     "shed": shed_slices,

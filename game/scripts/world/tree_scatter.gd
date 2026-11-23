@@ -16,6 +16,8 @@ static func candidates(chunk: Vector2i, chunk_size: float, per_chunk: int, world
 		out.append({
 			"pos": (origin + Vector2(rng.randf() * chunk_size, rng.randf() * chunk_size)).round(),
 			"angle": rng.randf_range(-PI, PI),
+			"keep": rng.randf(),       # rolls for Forest.tree_at / shrub_at
+			"species": rng.randf(),
 		})
 	return out
 

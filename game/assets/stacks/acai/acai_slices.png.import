@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cqclhfg6ocp0v"
-path="res://.godot/imported/tree_slices.png-5e25db4902f89a9452aee47a99d539b1.ctex"
+uid="uid://c0gwoyr2q8wbe"
+path="res://.godot/imported/acai_slices.png-e530318fbb2b7f584611e52bcccaa713.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/stacks/tree/tree_slices.png"
-dest_files=["res://.godot/imported/tree_slices.png-5e25db4902f89a9452aee47a99d539b1.ctex"]
+source_file="res://assets/stacks/acai/acai_slices.png"
+dest_files=["res://.godot/imported/acai_slices.png-e530318fbb2b7f584611e52bcccaa713.ctex"]
 
 [params]
 

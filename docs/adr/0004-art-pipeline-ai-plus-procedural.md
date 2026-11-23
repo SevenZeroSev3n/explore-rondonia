@@ -22,9 +22,16 @@ fast but cannot express holes or overhangs (locomotive wheels, open cab, arcades
 
 The agent's only image generator (Figma AI) spends paid AI credits, which the owner's Starter
 plan with a View seat may not include; the owner chose to generate the four-view sheets
-elsewhere from the prompts in `art/views/README.md`.
+elsewhere from the prompts in `art/views/00-workflow.md`.
 `tools/views_to_slices.py` carves them (visual hull: a voxel stays where the top, side and
 front/back silhouettes all see the object) into the same sizes as the placeholders.
+
+Also on 2026-11-23 the owner asked for a much denser forest with several species. Six real
+Rondônia trees (castanheira, seringueira, açaí, buriti, ipê-amarelo, embaúba) and a shrub now
+exist as stacks (seven with the shrub); their *art* can come from four-view sheets like any other object
+(`art/views/03-forest.md`), while their *placement* stays procedural
+(`game/scripts/world/forest.gd`: habitat by distance to road and rivers, noise for groves and
+clearings, planting spread over frames).
 
 ## Consequences
 

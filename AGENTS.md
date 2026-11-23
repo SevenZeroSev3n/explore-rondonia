@@ -6,8 +6,9 @@ detail in the linked documents.
 ## Current state
 
 Layer 1 drives on the real map: BR-364 from Vilhena to Porto Velho, rivers, the state border and
-town markers come from `game/data/geo/state_map.json` (built by `tools/geo/`); trees stream in
-chunks around the truck (`game/scenes/main.tscn`, `scripts/world/state_map.gd`). The passport
+town markers come from `game/data/geo/state_map.json` (built by `tools/geo/`); a dense forest of
+six real tree species (plus shrubs) streams in chunks around the truck, chosen by habitat in
+`scripts/world/forest.gd` and planted a bounded amount per frame (`game/scenes/main.tscn`, `scripts/world/state_map.gd`). The passport
 works for city stamps: arriving stamps a city, the panel (P) teleports to visited ones, progress
 and language are saved locally (`scripts/game/passport.gd`, autoloads `I18n` and `SaveStore`).
 UI text is PT/EN from `game/data/i18n/strings.json`. Photo mode works on layer 1 (F, then Space):
@@ -41,7 +42,7 @@ Godot 4.7.2 on PATH as `godot`; web export templates (no-threads) installed for 
 | `godot --headless --path game --import` | Import assets; run before tests or export on a fresh clone |
 | `godot --headless --path game -s addons/gut/gut_cmdln.gd -gdir=res://test/unit,res://test/integration -ginclude_subdirs -gexit` | GUT unit tests |
 | `python -m pytest tools/tests -q` | Python pipeline tests (needs `pip install -r tools/requirements.txt`) |
-| `python3 tools/build_stacks.py [--only NAME]` | Build every slice sheet: carves `art/views/<name>_views.png` (AI 4-view sheets, see `art/views/README.md`) or falls back to the code-drawn placeholder |
+| `python3 tools/build_stacks.py [--only NAME]` | Build every slice sheet: carves `art/views/<name>_views.png` (AI 4-view sheets, see `art/views/00-workflow.md`) or falls back to the code-drawn placeholder |
 | `python3 tools/geo/fetch.py [--force]` | Download OSM/IBGE geodata into `tools/cache/` (git-ignored) |
 | `python3 tools/geo/build_map.py` | Rebuild `game/data/geo/state_map.json` from the cache |
 | `godot --headless --path game --export-release "Web" ../build/web/index.html` | Web build into `build/` |

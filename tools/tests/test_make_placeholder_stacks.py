@@ -41,6 +41,6 @@ def test_truck_bed_is_hollow_from_above():
 
 
 def test_tree_is_deterministic():
-    a = mps.to_sheet(mps.tree_slices(seed=1))
-    b = mps.to_sheet(mps.tree_slices(seed=1))
+    a = mps.to_sheet(mps.castanheira_slices(seed=1))
+    b = mps.to_sheet(mps.castanheira_slices(seed=1))
     assert a.tobytes() == b.tobytes()
