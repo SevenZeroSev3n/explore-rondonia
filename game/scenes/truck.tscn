@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/vehicle/truck.gd" id="1_truck"]
+[ext_resource type="Script" path="res://scripts/render/sprite_stack.gd" id="2_stack"]
+[ext_resource type="Texture2D" path="res://assets/stacks/truck/truck_slices.png" id="3_sheet"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 9.0
+
+[node name="Truck" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("1_truck")
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="Stack" type="Node2D" parent="."]
+script = ExtResource("2_stack")
+sheet = ExtResource("3_sheet")
+slice_count = 9
+
+[node name="Camera" type="Camera2D" parent="."]
+position_smoothing_enabled = true
+position_smoothing_speed = 6.0

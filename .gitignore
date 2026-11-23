@@ -19,3 +19,6 @@ docs/reference/*.gif
 # OS
 .DS_Store
 Thumbs.db
+
+# Local tooling output
+.playwright-mcp/
