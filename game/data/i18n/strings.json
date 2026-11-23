@@ -1,6 +1,5 @@
 {
   "HUD_PASSPORT": {"en": "Passport %d/%d", "pt_BR": "Passaporte %d/%d"},
-  "HUD_PASSPORT_KEY": {"en": "P: passport", "pt_BR": "P: passaporte"},
   "STAMP_TOAST": {"en": "Stamped: %s", "pt_BR": "Carimbo: %s"},
   "PASSPORT_TITLE": {"en": "Tourist passport", "pt_BR": "Passaporte turístico"},
   "PASSPORT_STAMPS": {"en": "City stamps", "pt_BR": "Carimbos das cidades"},
@@ -8,5 +7,19 @@
   "PASSPORT_NOT_YET": {"en": "not visited yet", "pt_BR": "ainda não visitada"},
   "PASSPORT_HINT": {"en": "Jump to any city you have already visited.", "pt_BR": "Vá direto para uma cidade que você já visitou."},
   "PASSPORT_CLOSE": {"en": "Close (P)", "pt_BR": "Fechar (P)"},
-  "LANG_TOGGLE": {"en": "PT", "pt_BR": "EN"}
+  "LANG_TOGGLE": {"en": "PT", "pt_BR": "EN"},
+  "HUD_SECRETS": {"en": "Secrets %d/%d", "pt_BR": "Segredos %d/%d"},
+  "HUD_KEYS": {"en": "P: passport · F: camera", "pt_BR": "P: passaporte · F: câmera"},
+  "PHOTO_MODE_KEYS": {"en": "Space: shoot · F/Esc: put the camera away", "pt_BR": "Espaço: fotografar · F/Esc: guardar a câmera"},
+  "PHOTO_SAVED": {"en": "New photo: %s", "pt_BR": "Foto nova: %s"},
+  "PHOTO_ALREADY": {"en": "Already in your passport: %s", "pt_BR": "Já está no seu passaporte: %s"},
+  "PHOTO_HINT_FRAME": {"en": "Fit all of it inside the frame.", "pt_BR": "Enquadre inteiro."},
+  "PHOTO_HINT_CLOSER": {"en": "Get a little closer.", "pt_BR": "Chegue um pouco mais perto."},
+  "PHOTO_HINT_ANGLE": {"en": "Try another angle.", "pt_BR": "Tente de outro ângulo."},
+  "PASSPORT_SECRETS": {"en": "Secrets", "pt_BR": "Segredos"},
+  "PASSPORT_SECRET_UNKNOWN": {"en": "keep exploring", "pt_BR": "continue explorando"},
+  "PASSPORT_VIEW": {"en": "View", "pt_BR": "Ver"},
+  "SHEET_PHOTO_SOON": {"en": "[ real photo coming soon ]", "pt_BR": "[ foto real em breve ]"},
+  "SHEET_SOURCES": {"en": "Sources: %s", "pt_BR": "Fontes: %s"},
+  "SHEET_CLOSE": {"en": "Close", "pt_BR": "Fechar"}
 }

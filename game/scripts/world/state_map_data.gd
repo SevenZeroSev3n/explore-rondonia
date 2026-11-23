@@ -10,6 +10,7 @@ var road := PackedVector2Array()
 var border := PackedVector2Array()
 var rivers: Array[Dictionary] = []   ## {name: String, points: PackedVector2Array}
 var towns: Array[Dictionary] = []    ## {name, pos: Vector2, road_pos: Vector2, road_seg: int, road_km, stamp: bool}
+var spots: Array[Dictionary] = []    ## {id: String, pos: Vector2, view_from_deg: float}
 var attribution: PackedStringArray = []
 
 
@@ -44,6 +45,13 @@ static func from_dict(d: Dictionary) -> StateMapData:
 			"road_seg": int(t.get("road_seg", 0)),
 			"road_km": float(t.get("road_km", 0.0)),
 			"stamp": bool(t.get("stamp", false)),
+		})
+	for s in d.get("spots", []):
+		var spos: Array = s.get("pos", [0, 0])
+		m.spots.append({
+			"id": str(s.get("id", "")),
+			"pos": Vector2(spos[0], spos[1]),
+			"view_from_deg": float(s.get("view_from_deg", 0.0)),
 		})
 	for line in d.get("attribution", []):
 		m.attribution.append(str(line))

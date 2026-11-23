@@ -157,6 +157,11 @@ def closest_on_polyline(points: Sequence[Point], p: Point) -> tuple[Point, int]:
     return best_q, best_i
 
 
+def bearing_deg(frm: Point, to: Point) -> float:
+    """Compass bearing from frm to to in degrees: 0 = north (-y), 90 = east, in [0, 360)."""
+    return math.degrees(math.atan2(to[0] - frm[0], -(to[1] - frm[1]))) % 360.0
+
+
 def distance_along(points: Sequence[Point], p: Point) -> tuple[float, float]:
     """(distance from p to the polyline, arc length along it at the closest point)."""
     best_d, best_s, s = math.inf, 0.0, 0.0

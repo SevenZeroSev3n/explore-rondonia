@@ -12,6 +12,8 @@ func _enter_tree() -> void:
 	_action("steer_left", [_key(KEY_A), _key(KEY_LEFT), _axis(JOY_AXIS_LEFT_X, -1.0)])
 	_action("steer_right", [_key(KEY_D), _key(KEY_RIGHT), _axis(JOY_AXIS_LEFT_X, 1.0)])
 	_action("passport", [_key(KEY_P), _key(KEY_TAB), _button(JOY_BUTTON_Y)])
+	_action("photo", [_key(KEY_F), _button(JOY_BUTTON_X)])
+	_action("shoot", [_key(KEY_SPACE), _button(JOY_BUTTON_RIGHT_SHOULDER)])
 
 
 func _action(action_name: StringName, events: Array) -> void:

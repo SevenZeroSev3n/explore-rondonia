@@ -62,3 +62,13 @@ func test_missing_or_corrupt_save_is_a_fresh_start() -> void:
 	assert_eq(SaveStoreScript.decode(""), {})
 	assert_eq(SaveStoreScript.decode("{not json"), {})
 	assert_eq(SaveStoreScript.decode("[1, 2]"), {})
+
+
+func test_photos_only_count_the_first_time() -> void:
+	var p := Passport.new()
+	watch_signals(p)
+	assert_true(p.add_photo("secret_mandi"))
+	assert_false(p.add_photo("secret_mandi"))
+	assert_false(p.add_photo(""))
+	assert_signal_emit_count(p, "photographed", 1)
+	assert_eq(p.photo_count(["secret_mandi", "secret_teotonio"]), 1)

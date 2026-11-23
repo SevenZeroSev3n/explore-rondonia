@@ -19,7 +19,8 @@ exploration and collection, freight/delivery trucking, arcade driving, story adv
 - **Photo mode:** the camera works anywhere, on both layers. A photo counts only for registered
   photo spots, when the landmark is **fully in frame**, within a sensible distance, and the camera
   is **inside that landmark's angle window** (about ±30° around a per-landmark heading). Pass/fail
-  only in the MVP, with a subtle hint ("try another angle"). A valid photo unlocks that place's
+  only in the MVP, with a subtle hint ("try another angle"). On layer 1 the view is top-down, so
+  the window is wider (±50°, from the side facing the road); ±30° is for the rotating dioramas. A valid photo unlocks that place's
   sheet (ficha) with the real photo — the real place is the reward.
 - **On foot in dioramas:** on layer 2 the player leaves the vehicle and walks a small
   sprite-stacked traveler, to circle landmarks for the right angle. Layer 1 is always the vehicle.

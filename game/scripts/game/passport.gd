@@ -4,6 +4,7 @@ extends RefCounted
 ## SaveStore persists it.
 
 signal stamped(city: String)
+signal photographed(place_id: String)
 
 var stamps: PackedStringArray = []
 var photos: PackedStringArray = []
@@ -20,6 +21,27 @@ func stamp(city: String) -> bool:
 	stamps.append(city)
 	stamped.emit(city)
 	return true
+
+
+func has_photo(place_id: String) -> bool:
+	return photos.has(place_id)
+
+
+## Records a valid photo of a place; returns true only the first time.
+func add_photo(place_id: String) -> bool:
+	if place_id.is_empty() or has_photo(place_id):
+		return false
+	photos.append(place_id)
+	photographed.emit(place_id)
+	return true
+
+
+func photo_count(required: PackedStringArray) -> int:
+	var n := 0
+	for id in required:
+		if has_photo(id):
+			n += 1
+	return n
 
 
 func stamp_count(required: PackedStringArray) -> int:

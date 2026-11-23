@@ -44,3 +44,28 @@ func test_arriving_near_a_city_stamps_it() -> void:
 	world.truck.position = t.road_pos + Vector2(20, 0)
 	await wait_process_frames(2)
 	assert_true(SaveStore.passport.has_stamp("Ji-Paraná"))
+
+
+func _stand_and_shoot(id: String, offset_deg: float) -> PhotoRules.Result:
+	var spot: Dictionary = world.spots.filter(func(s): return s.id == id)[0]
+	var bearing := deg_to_rad(spot.view_from_deg + offset_deg)
+	world.truck.position = spot.pos + Vector2(sin(bearing), -cos(bearing)) * 50.0
+	world.truck.get_node("Camera").reset_smoothing()
+	await wait_process_frames(2)
+	return world.take_photo(world.hud.viewfinder_rect())
+
+
+func test_photo_from_the_right_side_unlocks_the_sheet() -> void:
+	var result: PhotoRules.Result = await _stand_and_shoot("secret_teotonio", 0.0)
+	assert_eq(result, PhotoRules.Result.OK)
+	assert_true(SaveStore.passport.has_photo("secret_teotonio"))
+	assert_true(world.hud._sheet.visible, "the sheet opens on a new photo")
+	assert_true(get_tree().paused, "the sheet pauses the game")
+	world.hud.close_sheet()
+	assert_false(get_tree().paused)
+
+
+func test_photo_from_the_wrong_side_only_hints() -> void:
+	var result: PhotoRules.Result = await _stand_and_shoot("secret_rondon_jiparana", 180.0)
+	assert_eq(result, PhotoRules.Result.WRONG_ANGLE)
+	assert_false(SaveStore.passport.has_photo("secret_rondon_jiparana"))

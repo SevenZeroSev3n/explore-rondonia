@@ -24,6 +24,17 @@ from the linked sources and must be re-checked when the place sheet text is writ
    `File:Rio Madeira- Cachoeira do Teotônio.jpg`, `File:Fishing at the Teotônio rapids.png`.
    Source: [UNIR — traditional fisheries submerged by the dams (2021)](https://gpbiodiversidadero.unir.br/uploads/32471044/Ictiologia/Alves%20Santanna,%20I.%20R.%20et%20al%202021_PESCARIAS%20TRADICIONAIS%20DA%20CACHOEIRA%20DO%20TEOTONIO%20SUBMERSAS%20PELA%20USINAS%20EM%20RONDONIA..pdf).
 
+## Positions used in the game
+
+| Secret | lat, lon | How it was obtained |
+|---|---|---|
+| Mandi | -10.9117, -62.3670 | Vale das Cachoeiras park listings (MaCamp, Pitchup, Tripadvisor agree within ~300 m); the falls are ~1.5 km away, under 100 px at map scale |
+| Rondon station, Ji-Paraná | -10.88928, -61.94658 | Urupá × Machado confluence in OSM (IBGE: station near the river mouth); street address not found |
+| Teotônio | -8.8553, -64.0500 | Madeira river in OSM inside the 64°2'–64°4' W band of the CPRM 2018 bathymetry report; approximate |
+
+The game asks the player to photograph each secret from the side facing BR-364 (`view_from_deg`
+computed by the pipeline), within ±50°.
+
 ## Proposed, not decided
 
 - **Casa de Rondon (Vilhena)** — the 1911 telegraph post that founded the city, Iphan-listed in

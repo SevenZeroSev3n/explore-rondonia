@@ -13,6 +13,7 @@ const CHUNK_RADIUS := 1          ## chunks kept around the truck's chunk in each
 const TREES_PER_CHUNK := 18
 const WORLD_SEED := 364
 const STAMP_RADIUS := 70.0
+const SPOT_REVEAL_DISTANCE := 500.0   ## secrets show a glint only when you are near
 
 const PASTURE := Color("4e7a40")
 const OUTSIDE := Color("2f4a2c")
@@ -22,6 +23,9 @@ const ASPHALT := Color("4a4a50")
 const STRIPE := Color("e8c64a")
 
 var map: StateMapData
+var catalog: PlaceCatalog
+var spots: Array[Dictionary] = []     ## PhotoRules spots (catalog rules + map position)
+var _spot_markers: Dictionary = {}    ## id -> Node2D
 var road_index: PolylineIndex
 var river_index: PolylineIndex
 var _chunks: Dictionary = {}     ## Vector2i -> Array[Node]
@@ -47,8 +51,16 @@ func _ready() -> void:
 	_place_towns()
 	truck.surface_provider = surface_at
 	truck.bounds_provider = is_inside_state
+	catalog = PlaceCatalog.load_dir()
+	for s in map.spots:
+		if catalog.has(s.id):
+			spots.append(catalog.spot_for(s.id, s.pos, s.view_from_deg))
+	_place_spot_markers()
 	hud.stamp_cities = map.stamp_cities()
+	hud.secret_ids = catalog.ids_of_kind("secret")
+	hud.catalog = catalog
 	hud.teleport_requested.connect(teleport_to)
+	hud.shutter_pressed.connect(take_photo)
 	hud.refresh()
 	truck.position = map.road[0]
 	truck.model.heading = map.road_heading(0)
@@ -60,10 +72,32 @@ func _process(_delta: float) -> void:
 	for city in Passport.cities_in_reach(map.towns, truck.position, STAMP_RADIUS):
 		if SaveStore.passport.stamp(city):
 			hud.toast(tr("STAMP_TOAST") % city)
+	for id in _spot_markers:
+		var m: Node2D = _spot_markers[id]
+		m.visible = truck.position.distance_to(m.position) < SPOT_REVEAL_DISTANCE
 	var c := TreeScatter.chunk_of(truck.position, CHUNK_SIZE)
 	if c != _last_chunk:
 		_last_chunk = c
 		_stream_chunks(c)
+
+
+## Judges a photo taken through the viewfinder (screen rect) from where the truck is.
+func take_photo(frame_screen: Rect2) -> PhotoRules.Result:
+	var inv := get_viewport().get_canvas_transform().affine_inverse()
+	var frame := Rect2(inv * frame_screen.position, frame_screen.size / get_viewport().get_canvas_transform().get_scale())
+	var spot := PhotoRules.pick_spot(spots, frame)
+	if spot.is_empty():
+		return PhotoRules.Result.NOT_IN_FRAME   # a photo of the landscape: nothing to record
+	var result := PhotoRules.evaluate(spot, frame, truck.position)
+	var title := catalog.name_of(spot.id, I18n.current())
+	if result != PhotoRules.Result.OK:
+		hud.toast(tr(PhotoRules.hint_key(result)))
+	elif SaveStore.passport.add_photo(spot.id):
+		hud.toast(tr("PHOTO_SAVED") % title)
+		hud.open_sheet(spot.id)
+	else:
+		hud.toast(tr("PHOTO_ALREADY") % title)
+	return result
 
 
 func teleport_to(city: String) -> void:
@@ -131,6 +165,23 @@ func _place_towns() -> void:
 		label.add_theme_constant_override("outline_size", 3)
 		marker.add_child(label)
 		ground.add_child(marker)
+
+
+## Placeholder glint until each secret gets its own sprite stack.
+func _place_spot_markers() -> void:
+	for s in spots:
+		var glint := Node2D.new()
+		glint.position = s.pos
+		var diamond := Polygon2D.new()
+		diamond.polygon = PackedVector2Array([Vector2(0, -6), Vector2(4, 0), Vector2(0, 6), Vector2(-4, 0)])
+		diamond.color = Color("fff2a8")
+		glint.add_child(diamond)
+		var pulse := glint.create_tween().set_loops()
+		pulse.tween_property(diamond, "scale", Vector2(1.4, 1.4), 0.6)
+		pulse.tween_property(diamond, "scale", Vector2.ONE, 0.6)
+		glint.visible = false
+		entities.add_child(glint)
+		_spot_markers[s.id] = glint
 
 
 func _stream_chunks(center: Vector2i) -> void:

@@ -17,6 +17,7 @@ func _ready() -> void:
 		locale = l
 		save())
 	passport.stamped.connect(func(_c: String) -> void: save())
+	passport.photographed.connect(func(_id: String) -> void: save())
 
 
 func load_save() -> void:

@@ -20,6 +20,7 @@ import geomath as gm  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent.parent
 CACHE = ROOT / "tools/cache"
 OUT = ROOT / "game/data/geo/state_map.json"
+PLACES = ROOT / "game/data/places"
 
 # Must match VehicleModel.max_speed in game/scripts/vehicle/vehicle_model.gd.
 CRUISE_PX_S = 90.0
@@ -95,6 +96,22 @@ def main() -> None:
         if len(pts) >= 2:
             rivers.append({"name": e["tags"]["name"], "points": rnd(pts)})
 
+    # Photo spots on layer 1 (ADR 0008). By default the player photographs a spot from the side
+    # facing the road, the way they arrive; a place file can override view_from_deg.
+    spots = []
+    for f in sorted(PLACES.glob("*.json")):
+        place = json.loads(f.read_text(encoding="utf-8"))
+        if place.get("layer") != 1 or "latlon" not in place:
+            continue
+        sx, sy = gm.project(*place["latlon"], ORIGIN)
+        spot = (sx * scale, sy * scale)
+        road_pt, _ = gm.closest_on_polyline(road_px, spot)
+        spots.append({
+            "id": place["id"],
+            "pos": [round(spot[0], 1), round(spot[1], 1)],
+            "view_from_deg": round(place.get("view_from_deg", gm.bearing_deg(spot, road_pt)), 1),
+        })
+
     state = load("ro_state.geojson")["features"][0]["geometry"]
     ring = state["coordinates"][0] if state["type"] == "Polygon" else max(
         (poly[0] for poly in state["coordinates"]), key=len)
@@ -112,6 +129,7 @@ def main() -> None:
             "points": rnd(road_px),
         },
         "towns": towns,
+        "spots": spots,
         "rivers": rivers,
         "border": rnd(border),
         "attribution": ATTRIBUTION,
@@ -121,7 +139,7 @@ def main() -> None:
     print(
         f"wrote {OUT.relative_to(ROOT)}: BR-364 {length_m / 1000:.0f} km -> {len(road_px)} pts, "
         f"{scale:.4f} px/m ({1 / scale:.1f} m/px), {len(towns)} towns, {len(rivers)} river ways, "
-        f"border {len(border)} pts, {OUT.stat().st_size / 1e3:.0f} kB"
+        f"{len(spots)} photo spots, border {len(border)} pts, {OUT.stat().st_size / 1e3:.0f} kB"
     )
 
 

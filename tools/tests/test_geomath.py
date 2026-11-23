@@ -114,6 +114,13 @@ def test_closest_on_polyline():
         gm.closest_on_polyline([(0, 0)], (1, 1))
 
 
+def test_bearing_deg():
+    assert gm.bearing_deg((0, 0), (0, -5)) == pytest.approx(0)      # north
+    assert gm.bearing_deg((0, 0), (5, 0)) == pytest.approx(90)      # east
+    assert gm.bearing_deg((0, 0), (0, 5)) == pytest.approx(180)     # south
+    assert gm.bearing_deg((0, 0), (-5, 0)) == pytest.approx(270)    # west
+
+
 def test_distance_along():
     line = [(0, 0), (10, 0), (10, 10)]
     d, s = gm.distance_along(line, (12, 5))
