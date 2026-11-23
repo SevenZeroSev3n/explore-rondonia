@@ -62,5 +62,5 @@ See `docs/adr/`. Summary:
 ## Language
 
 Repo artifacts (code, docs, ADRs, commits) are in English. Player-facing text lives in
-`data/i18n/` and `data/places/` in pt-BR and English. Local proper names stay in Portuguese
+`game/data/i18n/` and `game/data/places/` in pt-BR and English. Local proper names stay in Portuguese
 ("Três Caixas d'Água"), with a short English gloss.

@@ -6,7 +6,8 @@ A small cozy, bilingual (pt-BR / English) game set in the Brazilian state of Ron
 **sprite-stacking** pixel art. Drive the real highways, stamp your tourist passport, and
 photograph landmarks from the right angle to unlock what those places really look like.
 
-> Status: pre-MVP. First playable slice: drive a placeholder pickup on a placeholder road.
+> Status: pre-MVP. Drive a placeholder pickup along the real BR-364, Vilhena → Porto Velho.
+> Dev build: https://sevenzerosev3n.github.io/explore-rondonia/
 > Read [`CONTEXT.md`](CONTEXT.md) and the ADRs in [`docs/adr/`](docs/adr/).
 
 ## MVP
@@ -21,9 +22,8 @@ released on itch.io.
 
 ```
 art/       source art (AI 4-view sheets, .vox, raw exports) — never loaded by the game
-tools/     Python pipeline: geodata → game JSON, 4-view → slice sheet
-data/      game data: geo/ (generated map), places/ (tourist sheets), i18n/ (strings)
-game/      the Godot 4 project
+tools/     Python pipeline: geodata → game JSON, 4-view → slice sheet (downloads in tools/cache/)
+game/      the Godot 4 project; game/data/ holds geo/ (generated map), places/, i18n/
 docs/      adr/ (decisions), reference/ (guides and local-only reference maps)
 ```
 

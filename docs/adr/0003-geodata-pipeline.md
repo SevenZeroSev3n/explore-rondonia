@@ -10,11 +10,13 @@ etc. later should be cheap. Hand-drawing over a reference map does not scale and
 
 ## Decision
 
-A pipeline in `tools/` reads **OpenStreetMap** (highways, rivers) and **IBGE** (state border,
-municipal seats), then projects, simplifies and **uniformly scales** them into JSON under
-`data/geo/` that Godot reads. The scale is one parameter, tuned so driving BR-364 end to end at
-cruise speed takes **~8 minutes**. Uniform scale preserves real proportions between stretches.
-Raw downloads go to `data/geo/raw/` (git-ignored); generated JSON is committed.
+A pipeline in `tools/` reads **OpenStreetMap** (highways, rivers, town positions) and **IBGE**
+(state border), then projects, simplifies and **uniformly scales** them into JSON under
+`game/data/geo/` that Godot reads (inside the Godot project so the web export packs it). The
+scale is one parameter, tuned so driving BR-364 end to end at cruise speed takes **~8 minutes**. Uniform scale preserves real proportions between stretches.
+Raw downloads go to `tools/cache/` (git-ignored); generated JSON is committed. The road is the
+shortest path over the OSM BR-364 ways between the towns nearest each end, inside the largest
+connected component (OSM leaves small detached fragments).
 
 ## Consequences
 

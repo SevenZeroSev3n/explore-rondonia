@@ -12,7 +12,7 @@ A large foreign audience is expected. Text in code makes translation and review 
 
 - pt-BR and English ship together from the MVP. Initial language follows the browser locale
   (English unless the browser prefers Portuguese); a PT/EN toggle is always visible.
-- Player-facing strings live in `data/i18n/`; each place lives in `data/places/` with text in both
+- Player-facing strings live in `game/data/i18n/`; each place lives in `game/data/places/` with text in both
   languages, photos and credits. The agent drafts both languages; the owner reviews both.
 - Local proper names stay in Portuguese with a short English gloss.
 - Photos come from **Wikimedia Commons** when a free photo exists; otherwise from the **owner's own
