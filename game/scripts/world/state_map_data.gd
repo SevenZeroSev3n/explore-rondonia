@@ -9,7 +9,7 @@ var road_name := ""
 var road := PackedVector2Array()
 var border := PackedVector2Array()
 var rivers: Array[Dictionary] = []   ## {name: String, points: PackedVector2Array}
-var towns: Array[Dictionary] = []    ## {name: String, pos: Vector2, road_km: float, stamp: bool}
+var towns: Array[Dictionary] = []    ## {name, pos: Vector2, road_pos: Vector2, road_seg: int, road_km, stamp: bool}
 var attribution: PackedStringArray = []
 
 
@@ -36,15 +36,40 @@ static func from_dict(d: Dictionary) -> StateMapData:
 		m.rivers.append({"name": str(r.get("name", "")), "points": _points(r.get("points", []))})
 	for t in d.get("towns", []):
 		var pos: Array = t.get("pos", [0, 0])
+		var road_pos: Array = t.get("road_pos", pos)
 		m.towns.append({
 			"name": str(t.get("name", "")),
 			"pos": Vector2(pos[0], pos[1]),
+			"road_pos": Vector2(road_pos[0], road_pos[1]),
+			"road_seg": int(t.get("road_seg", 0)),
 			"road_km": float(t.get("road_km", 0.0)),
 			"stamp": bool(t.get("stamp", false)),
 		})
 	for line in d.get("attribution", []):
 		m.attribution.append(str(line))
 	return m
+
+
+func town(town_name: String) -> Dictionary:
+	for t in towns:
+		if t.name == town_name:
+			return t
+	return {}
+
+
+func stamp_cities() -> PackedStringArray:
+	var out: PackedStringArray = []
+	for t in towns:
+		if t.stamp:
+			out.append(t.name)
+	return out
+
+
+## Heading (0 = north, clockwise) of the road at segment i.
+func road_heading(i: int) -> float:
+	i = clampi(i, 0, road.size() - 2)
+	var d := road[i + 1] - road[i]
+	return atan2(d.x, -d.y)
 
 
 static func _points(raw: Array) -> PackedVector2Array:

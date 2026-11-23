@@ -104,6 +104,16 @@ def test_scale_for_drive_time():
         gm.scale_for_drive_time(0, 90, 8)
 
 
+def test_closest_on_polyline():
+    line = [(0, 0), (10, 0), (10, 10)]
+    q, i = gm.closest_on_polyline(line, (12, 5))
+    assert q == pytest.approx((10, 5)) and i == 1
+    q, i = gm.closest_on_polyline(line, (-3, -1))
+    assert q == pytest.approx((0, 0)) and i == 0
+    with pytest.raises(ValueError):
+        gm.closest_on_polyline([(0, 0)], (1, 1))
+
+
 def test_distance_along():
     line = [(0, 0), (10, 0), (10, 10)]
     d, s = gm.distance_along(line, (12, 5))

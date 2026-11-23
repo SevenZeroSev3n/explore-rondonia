@@ -74,9 +74,12 @@ def main() -> None:
         d, s = gm.distance_along(road_m, p)
         if d <= TOWN_MAX_ROAD_DISTANCE_M or name in STAMP_CITIES:
             x, y = p[0] * scale, p[1] * scale
+            (rx, ry), seg = gm.closest_on_polyline(road_px, (x, y))
             towns.append({
                 "name": name,
                 "pos": [round(x, 1), round(y, 1)],
+                "road_pos": [round(rx, 1), round(ry, 1)],   # where stamps trigger and teleports land
+                "road_seg": seg,                            # segment index, for the heading
                 "road_km": round(s / 1000.0, 1),
                 "stamp": name in STAMP_CITIES,
             })

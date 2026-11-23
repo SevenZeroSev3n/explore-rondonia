@@ -141,6 +141,22 @@ def scale_for_drive_time(road_length_m: float, cruise_px_s: float, minutes: floa
     return cruise_px_s * minutes * 60.0 / road_length_m
 
 
+def closest_on_polyline(points: Sequence[Point], p: Point) -> tuple[Point, int]:
+    """Closest point on the polyline to p, and the index of the segment it lies on."""
+    if len(points) < 2:
+        raise ValueError("need at least two points")
+    best_d, best_q, best_i = math.inf, points[0], 0
+    for i, (a, b) in enumerate(zip(points, points[1:])):
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        seg2 = dx * dx + dy * dy
+        t = 0.0 if seg2 == 0 else max(0.0, min(1.0, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / seg2))
+        q = (a[0] + t * dx, a[1] + t * dy)
+        d = dist(p, q)
+        if d < best_d:
+            best_d, best_q, best_i = d, q, i
+    return best_q, best_i
+
+
 def distance_along(points: Sequence[Point], p: Point) -> tuple[float, float]:
     """(distance from p to the polyline, arc length along it at the closest point)."""
     best_d, best_s, s = math.inf, 0.0, 0.0

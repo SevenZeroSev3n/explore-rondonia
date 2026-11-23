@@ -1,0 +1,12 @@
+{
+  "HUD_PASSPORT": {"en": "Passport %d/%d", "pt_BR": "Passaporte %d/%d"},
+  "HUD_PASSPORT_KEY": {"en": "P: passport", "pt_BR": "P: passaporte"},
+  "STAMP_TOAST": {"en": "Stamped: %s", "pt_BR": "Carimbo: %s"},
+  "PASSPORT_TITLE": {"en": "Tourist passport", "pt_BR": "Passaporte turístico"},
+  "PASSPORT_STAMPS": {"en": "City stamps", "pt_BR": "Carimbos das cidades"},
+  "PASSPORT_GO": {"en": "Go", "pt_BR": "Ir"},
+  "PASSPORT_NOT_YET": {"en": "not visited yet", "pt_BR": "ainda não visitada"},
+  "PASSPORT_HINT": {"en": "Jump to any city you have already visited.", "pt_BR": "Vá direto para uma cidade que você já visitou."},
+  "PASSPORT_CLOSE": {"en": "Close (P)", "pt_BR": "Fechar (P)"},
+  "LANG_TOGGLE": {"en": "PT", "pt_BR": "EN"}
+}

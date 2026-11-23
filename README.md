@@ -6,7 +6,8 @@ A small cozy, bilingual (pt-BR / English) game set in the Brazilian state of Ron
 **sprite-stacking** pixel art. Drive the real highways, stamp your tourist passport, and
 photograph landmarks from the right angle to unlock what those places really look like.
 
-> Status: pre-MVP. Drive a placeholder pickup along the real BR-364, Vilhena → Porto Velho.
+> Status: pre-MVP. Drive a placeholder pickup along the real BR-364, Vilhena → Porto Velho,
+> and stamp your passport in Vilhena, Ji-Paraná, Ariquemes and Porto Velho (PT/EN).
 > Dev build: https://sevenzerosev3n.github.io/explore-rondonia/
 > Read [`CONTEXT.md`](CONTEXT.md) and the ADRs in [`docs/adr/`](docs/adr/).
 

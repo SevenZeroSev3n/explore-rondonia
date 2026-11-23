@@ -12,6 +12,7 @@ const CHUNK_SIZE := 384.0
 const CHUNK_RADIUS := 1          ## chunks kept around the truck's chunk in each direction
 const TREES_PER_CHUNK := 18
 const WORLD_SEED := 364
+const STAMP_RADIUS := 70.0
 
 const PASTURE := Color("4e7a40")
 const OUTSIDE := Color("2f4a2c")
@@ -29,6 +30,7 @@ var _last_chunk := Vector2i(1 << 30, 1 << 30)
 @onready var ground: Node2D = $Ground
 @onready var entities: Node2D = $Entities
 @onready var truck: Truck = $Entities/Truck
+@onready var hud: Hud = $Hud
 
 
 func _ready() -> void:
@@ -45,18 +47,33 @@ func _ready() -> void:
 	_place_towns()
 	truck.surface_provider = surface_at
 	truck.bounds_provider = is_inside_state
+	hud.stamp_cities = map.stamp_cities()
+	hud.teleport_requested.connect(teleport_to)
+	hud.refresh()
 	truck.position = map.road[0]
-	var dir := map.road[1] - map.road[0]
-	truck.model.heading = atan2(dir.x, -dir.y)
+	truck.model.heading = map.road_heading(0)
 
 
 func _process(_delta: float) -> void:
 	if map == null:
 		return
+	for city in Passport.cities_in_reach(map.towns, truck.position, STAMP_RADIUS):
+		if SaveStore.passport.stamp(city):
+			hud.toast(tr("STAMP_TOAST") % city)
 	var c := TreeScatter.chunk_of(truck.position, CHUNK_SIZE)
 	if c != _last_chunk:
 		_last_chunk = c
 		_stream_chunks(c)
+
+
+func teleport_to(city: String) -> void:
+	var t := map.town(city)
+	if t.is_empty() or not SaveStore.passport.has_stamp(city):
+		return
+	truck.position = t.road_pos
+	truck.model.speed = 0.0
+	truck.model.heading = map.road_heading(t.road_seg)
+	truck.get_node("Camera").reset_smoothing()
 
 
 func surface_at(pos: Vector2) -> float:

@@ -13,6 +13,8 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 [autoload]
 
 InputSetup="*res://scripts/core/input_setup.gd"
+I18n="*res://scripts/core/i18n.gd"
+SaveStore="*res://scripts/core/save_store.gd"
 
 [display]
 

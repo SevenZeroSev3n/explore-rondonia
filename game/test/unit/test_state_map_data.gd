@@ -39,3 +39,19 @@ func test_driving_the_whole_road_takes_about_eight_minutes() -> void:
 		length += m.road[i].distance_to(m.road[i + 1])
 	var minutes := length / VehicleModel.new().max_speed / 60.0
 	assert_almost_eq(minutes, 8.0, 0.25, "ADR 0003: ~8 minutes end to end at cruise speed")
+
+
+func test_town_lookup_and_stamp_cities() -> void:
+	var m := StateMapData.load_file()
+	assert_eq(m.stamp_cities(), PackedStringArray(["Vilhena", "Ji-Paraná", "Ariquemes", "Porto Velho"]))
+	var t := m.town("Ji-Paraná")
+	assert_false(t.is_empty())
+	assert_lt(t.road_pos.distance_to(t.pos), 200.0, "the stamp point sits on the road near the town")
+	assert_true(m.town("Atlantis").is_empty())
+
+
+func test_road_heading_points_along_the_road() -> void:
+	var m := StateMapData.from_dict({"road": {"points": [[0, 0], [0, -10], [10, -10]]}})
+	assert_almost_eq(m.road_heading(0), 0.0, 0.0001, "north")
+	assert_almost_eq(m.road_heading(1), PI / 2, 0.0001, "east")
+	assert_almost_eq(m.road_heading(99), PI / 2, 0.0001, "clamped to the last segment")
