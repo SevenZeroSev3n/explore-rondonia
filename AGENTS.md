@@ -32,7 +32,7 @@ Integration tests must set `SaveStore.persist = false` and `SaveStore.flags = {"
 (and restore them) besides swapping the passport.
 
 Integration tests that load `main.tscn` must swap `SaveStore.passport` for a fresh `Passport`
-first, so they never write over the player's save. Art is built by `tools/build_stacks.py`: AI four-view sheets where they exist, code-drawn placeholders otherwise. Slice sizes and counts in `build_stacks.STACKS` are a contract with the scenes. Before assuming a file
+first, so they never write over the player's save. Art is built by `tools/build_stacks.py`: MagicaVoxel models in `art/vox/` first, then AI four-view sheets, then code-drawn placeholders. Slice sizes and counts in `build_stacks.STACKS` are a contract with the scenes. Before assuming a file
 exists, check with `git ls-files`.
 
 ## Commands
@@ -44,7 +44,9 @@ Godot 4.7.2 on PATH as `godot`; web export templates (no-threads) installed for 
 | `godot --headless --path game --import` | Import assets; run before tests or export on a fresh clone |
 | `godot --headless --path game -s addons/gut/gut_cmdln.gd -gdir=res://test/unit,res://test/integration -ginclude_subdirs -gexit` | GUT unit tests |
 | `python -m pytest tools/tests -q` | Python pipeline tests (needs `pip install -r tools/requirements.txt`) |
-| `python3 tools/build_stacks.py [--only NAME]` | Build every slice sheet: carves `art/views/<name>_views.png` (AI 4-view sheets, see `art/views/00-workflow.md`) or falls back to the code-drawn placeholder |
+| `python3 tools/build_stacks.py [--only NAME]` | Build every slice sheet: slices `art/vox/<name>.vox`, else carves `art/views/<name>_views.png` (AI 4-view sheets, see `art/views/00-workflow.md`), else the code-drawn placeholder |
+| `python3 tools/vox_models.py [--only NAME] [--force]` | Write the code-built voxel models into `art/vox/` (never overwrites without `--force`; see `art/vox/README.md`) |
+| `python3 tools/preview_stack.py SHEET --count N OUT.png` | Turntable preview of a slice sheet, drawn like `SpriteStack` |
 | `python3 tools/geo/fetch.py [--force]` | Download OSM/IBGE geodata into `tools/cache/` (git-ignored) |
 | `python3 tools/geo/build_map.py` | Rebuild `game/data/geo/state_map.json` from the cache |
 | `godot --headless --path game --export-release "Web" ../build/web/index.html` | Web build into `build/` |

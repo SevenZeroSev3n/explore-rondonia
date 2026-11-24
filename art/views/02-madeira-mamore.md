@@ -16,6 +16,9 @@ in that style.
 
 ## Steam locomotive — `locomotive_views.png`
 
+> **Now built from `art/vox/locomotive.vox`** (MagicaVoxel, see `art/vox/README.md`), which wins
+> over a views sheet in `tools/build_stacks.py`. The prompt below stays as a fallback.
+
 **In the game:** sits on the rails in the railway yard; photographed from the south (its right
 side).
 

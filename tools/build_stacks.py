@@ -1,8 +1,10 @@
 """Build every game slice sheet (ADR 0004).
 
-For each stack in STACKS: if art/views/<name>_views.png exists (a 2x2 four-view sheet from any
-image generator, see art/views/00-workflow.md), carve it with views_to_slices; otherwise fall back to
-the code-drawn placeholder from make_placeholder_stacks. Sizes and slice counts are the contract
+For each stack in STACKS, the first source that exists wins:
+  1. art/vox/<name>.vox — a MagicaVoxel model (front toward +Y, see tools/vox.py), sliced as is;
+  2. art/views/<name>_views.png — a 2x2 four-view sheet from any image generator
+     (see art/views/00-workflow.md), carved with views_to_slices;
+  3. the code-drawn placeholder from make_placeholder_stacks. Sizes and slice counts are the contract
 with the game (scenes and scripts hard-code the slice counts), so both routes use the same ones.
 
 Usage:
@@ -19,8 +21,10 @@ from PIL import Image
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import make_placeholder_stacks as placeholder  # noqa: E402
 import views_to_slices as v2s  # noqa: E402
+import vox  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
+VOX = ROOT / "art/vox"
 VIEWS = ROOT / "art/views"
 OUT = ROOT / "game/assets/stacks"
 
@@ -43,8 +47,12 @@ STACKS = {
 
 def build(name: str) -> str:
     W, L, H, colours = STACKS[name]
+    model = VOX / f"{name}.vox"
     src = VIEWS / f"{name}_views.png"
-    if src.exists():
+    if model.exists():
+        slices = vox.to_slices(vox.read(model))
+        how = f"from {model.relative_to(ROOT)}"
+    elif src.exists():
         filled, colour = v2s.carve(v2s.quadrants(Image.open(src).convert("RGBA")), W, L, H)
         slices = v2s.to_slices(filled, colour, colours)
         how = f"from {src.relative_to(ROOT)}"
