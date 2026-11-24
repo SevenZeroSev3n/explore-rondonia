@@ -41,7 +41,8 @@ Hard rules:
 2. **Same scale in all four cells.** The truck's length in TOP must equal its length in SIDE.
 3. **One object per cell, centred, not touching the cell edges.**
 4. **Nothing else in the image:** no ground line, no shadow, no text, no labels, no frame, no grid
-   lines, no watermark.
+   lines, no watermark. (Thin grid lines and frames are tolerated: the carver ignores a band along
+   each cell's edge and any thin straight line that crosses a whole cell.)
 5. **Plain background, the same in all four cells.** The carver detects the background from the
    four corners of each cell.
 6. **The object's own colours must not be the background colour.** A white truck on white loses
@@ -90,7 +91,8 @@ Hard rules:
 | The object is mirrored or drives sideways | TOP front not pointing up, or SIDE front not pointing right-to-left | Rotate/flip that cell in an editor and save again |
 | It is stretched or squashed | Views at different scales | Regenerate asking for "all four views at exactly the same scale" |
 | Colours look like stripes | Gradients or soft shading | Ask for "flat colours, no gradients, cel shading" |
-| Thin parts disappear (poles, legs, palm fronds) | Thinner than one voxel at game size | Ask for thicker, chunkier parts; pixel-art style helps |
+| Thin parts disappear (poles, legs, palm fronds) | Thinner than one voxel at game size | Ask for thicker, chunkier parts; pixel-art style helps; or lower its `cover` in `build_stacks.VIEW_OPTIONS` (embaúba and açaí use 0.2 to keep their trunks) |
+| A light object comes out thin or full of holes (the white truck) | Its colours are close to a light-grey background | Set a lower `tolerance` for it in `build_stacks.VIEW_OPTIONS` (the truck uses 12); works when the background is flat |
 | An opening is filled in (truck bed, cab, door) | Four views cannot carve holes or overhangs | Expected (ADR 0004). A MagicaVoxel model can replace it later |
 | Wrong overall size | The target box is fixed by the game | Not a problem with the image: the carver stretches every view to the box |
 

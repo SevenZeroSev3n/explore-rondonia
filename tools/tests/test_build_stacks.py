@@ -44,3 +44,14 @@ def test_a_vox_model_of_the_wrong_size_is_refused(dirs):
 
 def test_without_a_vox_or_views_it_falls_back_to_the_placeholder(dirs):
     assert "placeholder" in build_stacks.build("shrub")
+
+
+def test_view_options_name_real_stacks_and_real_parameters():
+    import inspect
+
+    import views_to_slices as v2s
+
+    params = set(inspect.signature(v2s.carve).parameters)
+    for name, options in build_stacks.VIEW_OPTIONS.items():
+        assert name in build_stacks.STACKS, name
+        assert set(options) <= params, (name, options)

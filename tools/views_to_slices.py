@@ -28,6 +28,10 @@ import numpy as np
 from PIL import Image
 
 
+EDGE_BAND = 0.02  # fraction of a cell ignored along its edges (grid lines, frames)
+LINE_MAX = 6      # thickest straight line, in source pixels, taken for a grid line
+
+
 def quadrants(img: Image.Image) -> dict[str, Image.Image]:
     w, h = img.size
     hw, hh = w // 2, h // 2
@@ -48,27 +52,77 @@ def background_mask(rgba: np.ndarray, tolerance: float) -> np.ndarray:
     return close | (rgba[..., 3] < 128)
 
 
-def silhouette(view: Image.Image, size: tuple[int, int], tolerance: float) -> tuple[np.ndarray, np.ndarray]:
-    """Crop the view to its object and resize to size (w, h): (mask[h, w] bool, rgb[h, w, 3])."""
-    rgba = np.asarray(view.convert("RGBA"))
-    fg = ~background_mask(rgba, tolerance)
+def drop_lines(fg: np.ndarray, span: float = 0.9) -> np.ndarray:
+    """Clear thin straight lines that cross the whole view (a grid drawn off-centre).
+
+    A row (or column) is a line when the object covers more than `span` of it and it belongs to a
+    run at most LINE_MAX pixels thick; a wide object fills a thick run of rows and is kept.
+    """
+    fg = fg.copy()
+    for axis in (1, 0):                          # rows, then columns
+        full = fg.mean(axis=axis) > span
+        i = 0
+        while i < len(full):
+            if not full[i]:
+                i += 1
+                continue
+            j = i
+            while j < len(full) and full[j]:
+                j += 1
+            if j - i <= LINE_MAX:
+                if axis == 1:
+                    fg[i:j, :] = False
+                else:
+                    fg[:, i:j] = False
+            i = j
+    return fg
+
+
+def _shrink(a: np.ndarray, size: tuple[int, int]) -> np.ndarray:
+    """Area-average a float [h, w] array down to size (w, h)."""
+    return np.asarray(Image.fromarray(a.astype(np.float32), "F").resize(size, Image.Resampling.BOX))
+
+
+def silhouette(view: Image.Image, size: tuple[int, int], tolerance: float,
+               cover: float = 0.5) -> tuple[np.ndarray, np.ndarray]:
+    """Crop the view to its object and resize to size (w, h): (mask[h, w] bool, rgb[h, w, 3]).
+
+    A thin band along the cell's edges is dropped first: generators often draw grid lines or a
+    frame between the cells, and the object must not touch the edges anyway (00-workflow.md).
+
+    tolerance: colour distance from the background still counted as background; lower it for
+    light objects on a light background (the background must then be flat).
+    cover: the fraction of a voxel's area the object must cover; lower keeps thin parts (trunks).
+    Colours average the object's pixels only, so thin parts do not fade into the background.
+    """
+    m = max(1, round(min(view.size) * EDGE_BAND))
+    rgba = np.asarray(view.convert("RGBA"))[m:-m, m:-m]
+    fg = drop_lines(~background_mask(rgba, tolerance))
     ys, xs = np.nonzero(fg)
     if len(xs) == 0:
         raise ValueError("a view has no object in it (check the background tolerance)")
-    box = (xs.min(), ys.min(), xs.max() + 1, ys.max() + 1)
-    cropped = Image.fromarray(rgba).crop(box)
-    mask_img = Image.fromarray((fg[box[1]:box[3], box[0]:box[2]] * 255).astype(np.uint8))
-    mask = np.asarray(mask_img.resize(size, Image.Resampling.BOX)) >= 128
-    rgb = np.asarray(cropped.convert("RGB").resize(size, Image.Resampling.BOX))
+    fg = fg[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+    rgb_in = rgba[ys.min():ys.max() + 1, xs.min():xs.max() + 1, :3].astype(np.float32)
+    area = _shrink(fg, size)
+    mask = area >= cover
+    sums = np.stack([_shrink(rgb_in[..., c] * fg, size) for c in range(3)], axis=-1)
+    rgb = np.clip(sums / np.maximum(area, 1e-6)[..., None], 0, 255).round().astype(np.uint8)
     return mask, rgb
 
 
-def carve(views: dict[str, Image.Image], W: int, L: int, H: int, tolerance: float = 40.0):
-    """Returns (filled[z, y, x] bool, colour[z, y, x, 3] uint8). z=0 is the ground."""
-    top_m, top_c = silhouette(views["top"], (W, L), tolerance)        # [y, x]
-    side_m, side_c = silhouette(views["side"], (L, H), tolerance)     # [row, y]; front on the left
-    front_m, front_c = silhouette(views["front"], (W, H), tolerance)  # [row, col]; mirrored x
-    back_m, back_c = silhouette(views["back"], (W, H), tolerance)     # [row, x]
+def carve(views: dict[str, Image.Image], W: int, L: int, H: int, tolerance: float = 40.0,
+          cover: float = 0.5):
+    """Returns (filled[z, y, x] bool, colour[z, y, x, 3] uint8). z=0 is the ground.
+
+    tolerance and cover are passed to silhouette() for every view.
+    """
+    def sil(name: str, size: tuple[int, int]):
+        return silhouette(views[name], size, tolerance, cover)
+
+    top_m, top_c = sil("top", (W, L))        # [y, x]
+    side_m, side_c = sil("side", (L, H))     # [row, y]; front on the left
+    front_m, front_c = sil("front", (W, H))  # [row, col]; mirrored x
+    back_m, back_c = sil("back", (W, H))     # [row, x]
 
     # Re-index everything to [z, ...] with z = 0 at the ground (image rows go top-down).
     side_m, side_c = side_m[::-1], side_c[::-1]                       # [z, y]

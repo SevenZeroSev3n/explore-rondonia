@@ -44,6 +44,15 @@ STACKS = {
     "water_tower": (16, 16, 36, 8),
 }
 
+# Per-stack carving options for four-view sheets (views_to_slices.silhouette):
+# a lower tolerance for light objects on a flat light background (the white truck); a lower
+# cover for objects whose thin parts (trunks) would otherwise vanish.
+VIEW_OPTIONS = {
+    "truck": {"tolerance": 12},
+    "embauba": {"cover": 0.2},
+    "acai": {"cover": 0.2},
+}
+
 
 def build(name: str) -> str:
     W, L, H, colours = STACKS[name]
@@ -53,7 +62,8 @@ def build(name: str) -> str:
         slices = vox.to_slices(vox.read(model))
         how = f"from {model.relative_to(ROOT)}"
     elif src.exists():
-        filled, colour = v2s.carve(v2s.quadrants(Image.open(src).convert("RGBA")), W, L, H)
+        views = v2s.quadrants(Image.open(src).convert("RGBA"))
+        filled, colour = v2s.carve(views, W, L, H, **VIEW_OPTIONS.get(name, {}))
         slices = v2s.to_slices(filled, colour, colours)
         how = f"from {src.relative_to(ROOT)}"
     else:
