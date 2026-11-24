@@ -6,7 +6,7 @@ detail in the linked documents.
 ## Current state
 
 Layer 1 drives on the real map: BR-364 from Vilhena to Porto Velho, rivers, the state border and
-town markers come from `game/data/geo/state_map.json` (built by `tools/geo/`); a dense forest of
+town markers come from `game/data/geo/state_map.json` (built by `tools/geo/`), seen from a zoomed-out aerial camera (ADR 0005 update); a dense forest of
 six real tree species (plus shrubs) streams in chunks around the truck, chosen by habitat in
 `scripts/world/forest.gd` and planted a bounded amount per frame (`game/scenes/main.tscn`, `scripts/world/state_map.gd`). The passport
 works for city stamps: arriving stamps a city, the panel (P) teleports to visited ones, progress

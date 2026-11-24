@@ -40,3 +40,14 @@ looks the same size on screen with more detail:
 
 The 480×270 decision above is kept for history; this update replaces its numbers.
 
+
+## Update (2026-11-24): the state map zoomed out
+
+The owner wanted the road trip to read like an aerial view: small trees, a wide stretch of road and
+forest on screen. The stretch mode is now **`canvas_items`** (still integer scale over the
+640×360 base), so the UI keeps its big pixels while the world can be drawn at the screen's own
+resolution. On layer 1 the camera zooms out (`StateMap.world_zoom`) so that one texel is a whole
+number of screen pixels, about half a UI pixel: zoom 1/2 at 720p and 1440p, 1/3 at 1080p. Texels
+stay square and never split. The streamed forest keeps two chunks around the truck in each
+direction to fill the wider view; town names keep UI size and draw above the trees. The diorama
+keeps zoom 1 (same size as before; its rotation is now drawn at screen resolution).

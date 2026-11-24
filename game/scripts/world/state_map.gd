@@ -7,7 +7,7 @@ const SHOULDER_HALF_WIDTH := 30.0
 const ROAD_TREE_CLEARANCE := 70.0
 const RIVER_HALF_WIDTH := 4.0
 const CHUNK_SIZE := 512.0
-const CHUNK_RADIUS := 1          ## chunks kept around the truck's chunk in each direction
+const CHUNK_RADIUS := 2          ## chunks kept around the truck's chunk in each direction (the zoomed-out view is up to 1920 px wide)
 const TREES_PER_CHUNK := 300
 const SHRUBS_PER_CHUNK := 130
 const DECALS_PER_CHUNK := 260   ## flat ground details (ADR 0009)
@@ -30,7 +30,7 @@ const PLANTS_PER_FRAME := 90
 const CLEARS_PER_FRAME := 200
 const WORLD_SEED := 364
 const STAMP_RADIUS := 93.0
-const SPOT_REVEAL_DISTANCE := 667.0   ## secrets show a glint only when you are near
+const SPOT_REVEAL_DISTANCE := 1100.0  ## secrets show a glint only when you are near (just past the zoomed-out view's edge)
 const DIORAMA_SCENE := preload("res://scenes/diorama_efmm.tscn")
 const DIORAMA_TOWN := "Porto Velho"
 const DIORAMA_ENTER_RADIUS := 147.0
@@ -48,6 +48,7 @@ var spots: Array[Dictionary] = []     ## PhotoRules spots (catalog rules + map p
 var _spot_markers: Dictionary = {}    ## id -> Node2D
 var road_index: PolylineIndex
 var river_index: PolylineIndex
+var _town_labels: Array[Label] = []   ## kept at UI size whatever the camera zoom
 var _chunks: Dictionary = {}     ## Vector2i -> Array[Node]
 var forest := Forest.new(WORLD_SEED)
 var _sheets: Dictionary = {}     ## species -> Texture2D
@@ -108,6 +109,8 @@ func _ready() -> void:
 	hud.setup_trip(map, stations)
 	if not SaveStore.has_flag("tutorial_seen"):
 		hud.show_tutorial.call_deferred()
+	get_tree().root.size_changed.connect(_apply_zoom)
+	_apply_zoom()
 	_qa_hooks.call_deferred()
 
 
@@ -245,6 +248,26 @@ func teleport_to(city: String) -> void:
 	truck.get_node("Camera").reset_smoothing()
 
 
+## Layer-1 camera zoom for a UI scale (screen pixels per UI pixel, integer stretch). The map is
+## drawn zoomed out at the screen's own resolution: one texel is a whole number of screen pixels,
+## about half a UI pixel, so trees and roads look small and the view is wide (ADR 0005 update).
+static func world_zoom(ui_scale: int) -> float:
+	ui_scale = maxi(ui_scale, 1)
+	return float(maxi(1, ui_scale / 2)) / float(ui_scale)
+
+
+func _apply_zoom() -> void:
+	var win := get_window()
+	var base := Vector2(win.content_scale_size)
+	var ui_scale := 1
+	if base.x > 0.0 and base.y > 0.0:
+		ui_scale = int(minf(win.size.x / base.x, win.size.y / base.y))
+	var z := world_zoom(ui_scale)
+	(truck.get_node("Camera") as Camera2D).zoom = Vector2(z, z)
+	for label in _town_labels:
+		label.scale = Vector2.ONE / z
+
+
 func surface_at(pos: Vector2) -> float:
 	var d := road_index.distance_within(pos, SHOULDER_HALF_WIDTH)
 	return RoadGeometry.surface_at_distance(d, ASPHALT_HALF_WIDTH, SHOULDER_HALF_WIDTH)
@@ -298,7 +321,9 @@ func _place_towns() -> void:
 		label.position = Vector2(r + 3, -8)
 		label.add_theme_color_override("font_outline_color", Color.BLACK)
 		label.add_theme_constant_override("outline_size", 3)
+		label.z_index = 100                     # above the trees and stacks next to the town
 		marker.add_child(label)
+		_town_labels.append(label)
 		ground.add_child(marker)
 
 
