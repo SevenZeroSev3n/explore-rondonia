@@ -8,8 +8,8 @@ enum Habitat { FOREST, RIVERSIDE, PASTURE }
 
 ## Slice counts: the contract with tools/build_stacks.py.
 const SLICES := {
-	"castanheira": 26, "seringueira": 20, "acai": 24, "buriti": 24,
-	"ipe": 20, "embauba": 18, "shrub": 6,
+	"castanheira": 35, "seringueira": 27, "acai": 32, "buriti": 32,
+	"ipe": 27, "embauba": 24, "shrub": 8,
 }
 
 ## Relative weights per habitat. Castanheiras are protected by law, so in Rondônia
@@ -24,8 +24,8 @@ const WEIGHTS := {
 const DENSITY := {Habitat.FOREST: 0.9, Habitat.RIVERSIDE: 0.75, Habitat.PASTURE: 0.07}
 const SHRUB_DENSITY := {Habitat.FOREST: 0.7, Habitat.RIVERSIDE: 0.5, Habitat.PASTURE: 0.0}
 
-const RIVERSIDE_DISTANCE := 70.0     ## px from a river
-const PASTURE_DISTANCE := 160.0      ## px from BR-364: the cleared belt along the road
+const RIVERSIDE_DISTANCE := 93.0     ## px from a river
+const PASTURE_DISTANCE := 213.0      ## px from BR-364: the cleared belt along the road
 
 var _noise := FastNoiseLite.new()
 
@@ -33,7 +33,7 @@ var _noise := FastNoiseLite.new()
 func _init(world_seed: int = 364) -> void:
 	_noise.seed = world_seed
 	_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
-	_noise.frequency = 0.004             # clearings and groves a few hundred px across
+	_noise.frequency = 0.003             # clearings and groves a few hundred px across
 
 
 static func habitat(road_distance: float, river_distance: float) -> Habitat:

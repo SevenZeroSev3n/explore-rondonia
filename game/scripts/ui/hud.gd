@@ -8,10 +8,10 @@ extends CanvasLayer
 signal teleport_requested(city: String)
 signal shutter_pressed(frame_screen: Rect2)
 
-## Text uses the project theme (assets/ui_theme.tres): Pixelify Sans at 13 px, the size
-## where its pixel grid lands on whole screen pixels and every Portuguese accent reads.
+## Text uses the project theme (assets/ui_theme.tres): Pixelify Sans at 18 px at 640x360
+## (ADR 0005), where its strokes are even and every Portuguese accent reads.
 const HEADING_COLOR := Color("f2d04a")
-const VIEWFINDER := Vector2(240, 150)   ## screen px, centred
+const VIEWFINDER := Vector2(320, 200)   ## screen px, centred
 
 var stamp_cities: PackedStringArray = []
 var secret_ids: PackedStringArray = []
@@ -74,22 +74,22 @@ func _ready() -> void:
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_root)
 
-	_counter = _label(_root, Vector2(6, 2))
-	_landmarks_counter = _label(_root, Vector2(6, 17))
-	_secrets_counter = _label(_root, Vector2(6, 32))
+	_counter = _label(_root, Vector2(8, 3))
+	_landmarks_counter = _label(_root, Vector2(8, 23))
+	_secrets_counter = _label(_root, Vector2(8, 43))
 	# Key hints sit on the bottom line; standing prompts ("Enter: ...") just above them.
 	_key_hint = _label(_root, Vector2.ZERO)
 	_key_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	_key_hint.offset_top = -17
-	_key_hint.offset_bottom = -2
-	_key_hint.offset_left = 6
+	_key_hint.offset_top = -23
+	_key_hint.offset_bottom = -3
+	_key_hint.offset_left = 8
 	_key_hint.modulate = Color(1, 1, 1, 0.7)
 
 	_lang = Button.new()
 	_lang.focus_mode = Control.FOCUS_NONE   # never steal the driving keys
 	_lang.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_lang.position = Vector2(-26, 3)
-	_lang.custom_minimum_size = Vector2(22, 12)
+	_lang.position = Vector2(-35, 4)
+	_lang.custom_minimum_size = Vector2(29, 16)
 	_lang.pressed.connect(I18n.toggle)
 	_root.add_child(_lang)
 
@@ -98,27 +98,27 @@ func _ready() -> void:
 	_toast = _label(_root, Vector2.ZERO)
 	# Full width under the counters, text centred: anchors + offsets, not a raw position.
 	_toast.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	_toast.offset_top = 50
-	_toast.offset_bottom = 66
+	_toast.offset_top = 67
+	_toast.offset_bottom = 88
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_toast.modulate.a = 0.0
 
 	_prompt = _label(_root, Vector2.ZERO)
 	_prompt.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	_prompt.offset_top = -36
-	_prompt.offset_bottom = -20
+	_prompt.offset_top = -48
+	_prompt.offset_bottom = -27
 	_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 	_build_panel()
 	_build_sheet()
-	_tutorial = _build_info(430)
+	_tutorial = _build_info(608)
 	_tutorial.button.pressed.connect(close_tutorial)
-	_complete = _build_info(380)
+	_complete = _build_info(507)
 	_complete.button.pressed.connect(func() -> void: _hide_info(_complete))
 	_complete.button2.pressed.connect(func() -> void:
 		_hide_info(_complete)
 		show_credits())
-	_credits = _build_info(420)
+	_credits = _build_info(560)
 	_credits.button.pressed.connect(func() -> void: _hide_info(_credits))
 	I18n.locale_changed.connect(func(_l: String) -> void: refresh())
 	SaveStore.passport.stamped.connect(func(_c: String) -> void: refresh())
@@ -409,11 +409,11 @@ func _build_info(width: float) -> Dictionary:
 	var title := _heading(box)
 	var body := Label.new()
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD
-	body.custom_minimum_size = Vector2(width - 16, 0)
+	body.custom_minimum_size = Vector2(width - 22, 0)
 	box.add_child(body)
 	var extra := _dim("")
 	extra.autowrap_mode = TextServer.AUTOWRAP_WORD
-	extra.custom_minimum_size = Vector2(width - 16, 0)
+	extra.custom_minimum_size = Vector2(width - 22, 0)
 	box.add_child(extra)
 	var buttons := HBoxContainer.new()
 	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -433,7 +433,7 @@ func _build_viewfinder() -> void:
 	_viewfinder.draw.connect(func() -> void:
 		var r := viewfinder_rect()
 		var c := Color(1, 1, 1, 0.9)
-		var l := 14.0
+		var l := 19.0
 		for corner in [r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)]:
 			var sx := 1.0 if corner.x == r.position.x else -1.0
 			var sy := 1.0 if corner.y == r.position.y else -1.0
@@ -453,18 +453,18 @@ func _build_viewfinder() -> void:
 
 
 func _build_panel() -> void:
-	_panel = _centred_panel(Vector2(360, 0))
+	_panel = _centred_panel(Vector2(480, 0))
 	var box := _panel.get_child(0).get_child(0) as VBoxContainer
 	_title = _heading(box)
-	# The lists scroll; title and buttons stay put, so the panel fits 270 px with any content.
+	# The lists scroll; title and buttons stay put, so the panel fits 360 px with any content.
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, 136)
+	scroll.custom_minimum_size = Vector2(0, 181)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.follow_focus = true
 	box.add_child(scroll)
 	var lists := VBoxContainer.new()
 	lists.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	lists.add_theme_constant_override("separation", 2)
+	lists.add_theme_constant_override("separation", 3)
 	scroll.add_child(lists)
 	_subtitle = Label.new()
 	lists.add_child(_subtitle)
@@ -493,15 +493,15 @@ func _build_panel() -> void:
 
 
 func _build_sheet() -> void:
-	_sheet = _centred_panel(Vector2(464, 0))
+	_sheet = _centred_panel(Vector2(619, 0))
 	var box := _sheet.get_child(0).get_child(0) as VBoxContainer
 	_sheet_title = _heading(box)
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", 11)
 	box.add_child(row)
 	# Photo frame (3:2-ish like most photos); the placeholder label sits inside it.
 	_sheet_photo_rect = TextureRect.new()
-	_sheet_photo_rect.custom_minimum_size = Vector2(168, 114)
+	_sheet_photo_rect.custom_minimum_size = Vector2(224, 152)
 	_sheet_photo_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_sheet_photo_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	_sheet_photo_rect.clip_contents = true
@@ -515,7 +515,7 @@ func _build_sheet() -> void:
 	_sheet_photo_rect.add_child(_sheet_photo)
 	_sheet_text = Label.new()
 	_sheet_text.autowrap_mode = TextServer.AUTOWRAP_WORD
-	_sheet_text.custom_minimum_size = Vector2(272, 0)
+	_sheet_text.custom_minimum_size = Vector2(363, 0)
 	_sheet_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(_sheet_text)
 	_sheet_photo_credit = _dim("")
@@ -540,10 +540,10 @@ func _centred_panel(min_size: Vector2) -> PanelContainer:
 	panel.grow_vertical = Control.GROW_DIRECTION_BOTH
 	var margin := MarginContainer.new()
 	for side in ["left", "right", "top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + side, 8)
+		margin.add_theme_constant_override("margin_" + side, 11)
 	panel.add_child(margin)
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 4)
+	box.add_theme_constant_override("separation", 5)
 	margin.add_child(box)
 	return panel
 
@@ -588,6 +588,6 @@ func _label(parent: Control, pos: Vector2) -> Label:
 	var l := Label.new()
 	l.position = pos
 	l.add_theme_color_override("font_outline_color", Color.BLACK)
-	l.add_theme_constant_override("outline_size", 3)
+	l.add_theme_constant_override("outline_size", 4)
 	parent.add_child(l)
 	return l

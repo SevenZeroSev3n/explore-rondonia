@@ -30,18 +30,18 @@ OUT = ROOT / "game/assets/stacks"
 
 # name: (W, L, H, palette colours). L is the length along the facing direction.
 STACKS = {
-    "truck": (20, 36, 9, 16),
-    "castanheira": (24, 24, 26, 12),
-    "seringueira": (20, 20, 20, 12),
-    "acai": (12, 12, 24, 8),
-    "buriti": (18, 18, 24, 8),
-    "ipe": (20, 20, 20, 8),
-    "embauba": (16, 16, 18, 8),
-    "shrub": (10, 10, 6, 6),
-    "traveler": (8, 8, 14, 8),
-    "locomotive": (18, 40, 17, 12),
-    "shed": (64, 36, 20, 12),
-    "water_tower": (16, 16, 36, 8),
+    "truck": (27, 48, 12, 16),
+    "castanheira": (32, 32, 35, 12),
+    "seringueira": (27, 27, 27, 12),
+    "acai": (16, 16, 32, 8),
+    "buriti": (24, 24, 32, 8),
+    "ipe": (27, 27, 27, 8),
+    "embauba": (21, 21, 24, 8),
+    "shrub": (13, 13, 8, 6),
+    "traveler": (11, 11, 19, 8),
+    "locomotive": (24, 53, 23, 12),
+    "shed": (85, 48, 27, 12),
+    "water_tower": (21, 21, 48, 8),
 }
 
 # Per-stack carving options for four-view sheets (views_to_slices.silhouette):
@@ -52,6 +52,17 @@ VIEW_OPTIONS = {
     "embauba": {"cover": 0.2},
     "acai": {"cover": 0.2},
 }
+
+
+def fit(slices: list[Image.Image], W: int, L: int, H: int) -> list[Image.Image]:
+    """Nearest-neighbour resample of a code-drawn placeholder to the contract size (W x L, H slices).
+
+    Placeholders are drawn at fixed sizes; this keeps them usable as a fallback when the
+    contract changes (ADR 0005 resolution update). Real art never goes through here.
+    """
+    n = len(slices)
+    picked = [slices[min(n - 1, z * n // H)] for z in range(H)]
+    return [s.resize((W, L), Image.Resampling.NEAREST) for s in picked]
 
 
 def build(name: str) -> str:
@@ -67,7 +78,7 @@ def build(name: str) -> str:
         slices = v2s.to_slices(filled, colour, colours)
         how = f"from {src.relative_to(ROOT)}"
     else:
-        slices = placeholder.STACKS[name]()
+        slices = fit(placeholder.STACKS[name](), W, L, H)
         how = "placeholder"
     got = (slices[0].size, len(slices))
     if got != ((W, L), H):

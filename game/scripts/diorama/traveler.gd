@@ -3,7 +3,7 @@ extends CharacterBody2D
 ## The player on foot in a diorama (layer 2, ADR 0008). Moves relative to the
 ## SCREEN, so "up" stays up however the camera is turned.
 
-const SPEED := 46.0
+const SPEED := 61.0
 
 ## Camera rotation to move relative to. Set by the diorama every frame.
 var view_rotation := 0.0

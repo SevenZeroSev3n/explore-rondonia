@@ -22,7 +22,7 @@ in that style.
 **In the game:** sits on the rails in the railway yard; photographed from the south (its right
 side).
 
-**Target box:** 18 wide × 40 long × 17 tall voxels.
+**Target box:** 24 wide × 53 long × 23 tall voxels.
 
 **What it should look like:** a small early-1900s narrow-gauge steam locomotive: long black
 cylindrical boiler at the front, a tall flared smokestack near the front, a steam dome on top of
@@ -57,7 +57,7 @@ driver's cab at the back with a roof. Black iron with red trim and a few brass d
 **In the game:** a long building next to the rails, between the tracks and the river; its door
 faces the visitor.
 
-**Target box:** 64 wide × 36 deep × 20 tall voxels (wide and long, so the **front is the long
+**Target box:** 85 wide × 48 deep × 27 tall voxels (wide and long, so the **front is the long
 side**).
 
 **What it should look like:** an early-1900s railway workshop (oficina / galpão): long
@@ -96,7 +96,7 @@ along the long side**.
 **In the game:** the diorama places **three copies** of this tower in a triangle, as in Porto
 Velho's "Três Marias". Photographed from the east.
 
-**Target box:** 16 wide × 16 long × 36 tall voxels (tall and slender).
+**Target box:** 21 wide × 21 long × 48 tall voxels (tall and slender).
 
 **What it should look like:** an early-1900s riveted steel water tower: a cylindrical tank with a
 shallow conical roof, sitting on **four tall straight steel legs** joined by horizontal rings and

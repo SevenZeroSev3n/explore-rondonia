@@ -14,15 +14,15 @@
   "diorama_layout": {
     "stack": null,
     "local_pos": [
-      20,
-      -112
+      27,
+      -149
     ],
     "facing_deg": 0,
     "view_from_deg": 180
   },
   "photo_rules": {
-    "radius_px": 16,
-    "max_distance_px": 90,
+    "radius_px": 21,
+    "max_distance_px": 120,
     "window_half_deg": 30
   },
   "photos": [],

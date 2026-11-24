@@ -14,15 +14,15 @@
   "diorama_layout": {
     "stack": "locomotive",
     "local_pos": [
-      -60,
-      -40
+      -80,
+      -53
     ],
     "facing_deg": 90,
     "view_from_deg": 180
   },
   "photo_rules": {
-    "radius_px": 22,
-    "max_distance_px": 110,
+    "radius_px": 29,
+    "max_distance_px": 147,
     "window_half_deg": 30
   },
   "photos": [],

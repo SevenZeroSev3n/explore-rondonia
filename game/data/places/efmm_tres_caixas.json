@@ -14,29 +14,29 @@
   "diorama_layout": {
     "stack": "water_tower",
     "local_pos": [
-      -150,
-      95
+      -200,
+      127
     ],
     "facing_deg": 0,
     "view_from_deg": 90,
     "instances": [
       [
-        -14,
-        -10
+        -19,
+        -13
       ],
       [
-        12,
-        -6
+        16,
+        -8
       ],
       [
-        -2,
-        14
+        -3,
+        19
       ]
     ]
   },
   "photo_rules": {
-    "radius_px": 28,
-    "max_distance_px": 110,
+    "radius_px": 37,
+    "max_distance_px": 147,
     "window_half_deg": 30
   },
   "photos": [],

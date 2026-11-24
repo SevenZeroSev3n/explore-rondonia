@@ -100,7 +100,7 @@ Hard rules:
 
 - Target sizes are a contract with the game code (`tools/build_stacks.py`, `STACKS`). Changing
   one means changing the slice counts in the scenes: ask before doing it.
-- The game is pixel art at 480×270 (ADR 0005). A 24-voxel tree is about 24 screen pixels wide, so
+- The game is pixel art at 640×360 (ADR 0005). A 32-voxel tree is about 32 screen pixels wide, so
   detail smaller than ~1/24 of the object will not survive. Big shapes and clear colours win.
 - Licence: original art in this repository is CC BY 4.0 (ADR 0007). Generate only original
   designs: no brands, logos or copies of existing games.

@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" path="res://assets/stacks/traveler/traveler_slices.png" id="3_sheet"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_feet"]
-radius = 3.0
+radius = 4.0
 
 [node name="Traveler" type="CharacterBody2D"]
 motion_mode = 1
@@ -17,4 +17,4 @@ shape = SubResource("CircleShape2D_feet")
 [node name="Stack" type="Node2D" parent="."]
 script = ExtResource("2_stack")
 sheet = ExtResource("3_sheet")
-slice_count = 14
+slice_count = 19

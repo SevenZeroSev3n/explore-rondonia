@@ -29,4 +29,4 @@ On Linux, MagicaVoxel runs through Wine:
 
 | Name | Size (W × L × H) | Notes |
 |---|---|---|
-| `locomotive` | 18 × 40 × 17 | Early-1900s narrow-gauge steam locomotive: spoked wheels with side rods, slatted cowcatcher, open cab with window holes. Original design, not a copy of a specific engine (`art/views/02-madeira-mamore.md`). |
+| `locomotive` | 24 × 53 × 23 | Early-1900s narrow-gauge steam locomotive: spoked wheels with side rods, slatted cowcatcher, open cab with window holes. Original design, not a copy of a specific engine (`art/views/02-madeira-mamore.md`). |

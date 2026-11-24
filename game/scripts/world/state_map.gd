@@ -2,11 +2,11 @@ extends Node2D
 ## Layer 1: the whole state, from game/data/geo/state_map.json (ADR 0002/0003).
 ## North-up; trees are streamed in chunks around the truck.
 
-const ASPHALT_HALF_WIDTH := 13.0
-const SHOULDER_HALF_WIDTH := 18.0
-const ROAD_TREE_CLEARANCE := 44.0
-const RIVER_HALF_WIDTH := 3.0
-const CHUNK_SIZE := 384.0
+const ASPHALT_HALF_WIDTH := 17.0
+const SHOULDER_HALF_WIDTH := 24.0
+const ROAD_TREE_CLEARANCE := 59.0
+const RIVER_HALF_WIDTH := 4.0
+const CHUNK_SIZE := 512.0
 const CHUNK_RADIUS := 1          ## chunks kept around the truck's chunk in each direction
 const TREES_PER_CHUNK := 300
 const SHRUBS_PER_CHUNK := 130
@@ -15,11 +15,11 @@ const SHRUBS_PER_CHUNK := 130
 const PLANTS_PER_FRAME := 90
 const CLEARS_PER_FRAME := 200
 const WORLD_SEED := 364
-const STAMP_RADIUS := 70.0
-const SPOT_REVEAL_DISTANCE := 500.0   ## secrets show a glint only when you are near
+const STAMP_RADIUS := 93.0
+const SPOT_REVEAL_DISTANCE := 667.0   ## secrets show a glint only when you are near
 const DIORAMA_SCENE := preload("res://scenes/diorama_efmm.tscn")
 const DIORAMA_TOWN := "Porto Velho"
-const DIORAMA_ENTER_RADIUS := 110.0
+const DIORAMA_ENTER_RADIUS := 147.0
 
 const PASTURE := Color("4e7a40")
 const OUTSIDE := Color("2f4a2c")
@@ -253,7 +253,7 @@ func _place_towns() -> void:
 		var marker := Node2D.new()
 		marker.position = t.pos
 		var dot := Polygon2D.new()
-		var r := 7.0 if t.stamp else 4.0
+		var r := 9.0 if t.stamp else 5.0
 		var pts := PackedVector2Array()
 		for i in 12:
 			pts.append(Vector2.from_angle(TAU * i / 12.0) * r)
@@ -348,7 +348,7 @@ func _habitat_at(p: Vector2) -> Variant:
 	if road_d < ROAD_TREE_CLEARANCE:
 		return null
 	var river_d := river_index.distance_within(p, Forest.RIVERSIDE_DISTANCE)
-	if river_d < RIVER_HALF_WIDTH + 8.0:
+	if river_d < RIVER_HALF_WIDTH + 11.0:
 		return null
 	return Forest.habitat(road_d, river_d)
 

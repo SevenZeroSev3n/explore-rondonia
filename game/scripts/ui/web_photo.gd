@@ -1,6 +1,6 @@
 class_name WebPhoto
 extends RefCounted
-## Real photos stay sharp on the web build (ADR 0005): the game renders at 480x270
+## Real photos stay sharp on the web build (ADR 0005): the game renders at 640x360
 ## and scales up, which would pixelate a photo, so on the web the photo is an HTML
 ## <img> laid exactly over its frame in the game. Elsewhere this does nothing and
 ## the in-game TextureRect shows the (downscaled) photo instead.

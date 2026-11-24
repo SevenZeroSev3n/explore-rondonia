@@ -23,7 +23,7 @@ OUT = ROOT / "game/data/geo/state_map.json"
 PLACES = ROOT / "game/data/places"
 
 # Must match VehicleModel.max_speed in game/scripts/vehicle/vehicle_model.gd.
-CRUISE_PX_S = 90.0
+CRUISE_PX_S = 120.0
 TARGET_MINUTES = 8.0
 ORIGIN = (-10.9, -62.8)          # (lat, lon), roughly the state's middle
 ROAD_FROM, ROAD_TO = "Vilhena", "Porto Velho"

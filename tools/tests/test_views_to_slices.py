@@ -94,12 +94,14 @@ def test_exposed_treats_outside_as_empty():
     assert list(v2s.exposed(f, 1, -1)[0, :, 0]) == [False, False, True]
 
 
-def test_build_stacks_contract_matches_the_placeholders():
+def test_every_placeholder_fits_the_build_stacks_contract():
+    # Placeholders are drawn at fixed sizes and resampled to the contract (ADR 0005 update).
     import build_stacks
     import make_placeholder_stacks as mps
     for name, (W, L, H, _) in build_stacks.STACKS.items():
-        slices = mps.STACKS[name]()
-        assert (slices[0].size, len(slices)) == ((W, L), H), name
+        slices = build_stacks.fit(mps.STACKS[name](), W, L, H)
+        assert {s.size for s in slices} == {(W, L)} and len(slices) == H, name
+        assert slices[0].getbbox() is not None, f"{name}: the ground slice lost the object"
 
 
 def test_grid_lines_between_the_cells_are_ignored():

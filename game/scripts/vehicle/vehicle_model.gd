@@ -8,11 +8,11 @@ const ASPHALT := 1.0
 const DIRT := 0.6
 const OFFROAD := 0.35
 
-var max_speed := 90.0       ## px/s on asphalt
-var acceleration := 55.0    ## px/s²
-var braking := 140.0        ## px/s²
-var drag := 30.0            ## px/s² when coasting
-var reverse_max := 25.0     ## px/s
+var max_speed := 120.0      ## px/s on asphalt
+var acceleration := 73.0    ## px/s²
+var braking := 187.0        ## px/s²
+var drag := 40.0            ## px/s² when coasting
+var reverse_max := 33.0     ## px/s
 var steer_rate := 2.4       ## rad/s at full steering authority
 
 var speed := 0.0            ## px/s, negative when reversing

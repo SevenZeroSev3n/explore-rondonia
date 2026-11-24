@@ -25,7 +25,7 @@ General tips for trees:
 
 ## Castanheira (Brazil-nut tree, *Bertholletia excelsa*) — `castanheira_views.png`
 
-**Target box:** 24 × 24 × 26 voxels. The tallest tree of the forest.
+**Target box:** 32 × 32 × 35 voxels. The tallest tree of the forest.
 
 **Look:** an emergent giant: a very tall, straight, **bare grey cylindrical trunk** for most of
 its height, branches only near the top, then a **wide, flattish, umbrella-like dense crown**,
@@ -45,7 +45,7 @@ dark green.
 
 ## Seringueira (rubber tree, *Hevea brasiliensis*) — `seringueira_views.png`
 
-**Target box:** 20 × 20 × 20 voxels. Medium tree.
+**Target box:** 27 × 27 × 27 voxels. Medium tree.
 
 **Look:** a medium tree with a **light grey-brown smooth trunk** and a **dense, rounded,
 egg-shaped crown** of glossy mid-green leaves starting about a third of the way up. Rondônia's
@@ -65,7 +65,7 @@ rubber history (the *seringueiros*) makes it a meaningful species.
 
 ## Açaí palm (*Euterpe precatoria*) — `acai_views.png`
 
-**Target box:** 12 × 12 × 24 voxels. Thin and tall.
+**Target box:** 16 × 16 × 32 voxels. Thin and tall.
 
 **Look:** a **very slender, straight grey-green trunk** (one stem) and, at the very top, a small
 crown of **arching, drooping feather-like fronds** radiating out, with a hint of dark purple
@@ -89,7 +89,7 @@ loses them.
 
 ## Buriti palm (*Mauritia flexuosa*) — `buriti_views.png`
 
-**Target box:** 18 × 18 × 24 voxels.
+**Target box:** 24 × 24 × 32 voxels.
 
 **Look:** a **thick, straight, columnar brown-grey trunk** with ring marks and a **round crown of
 large fan-shaped (palmate) leaves**, spiky at the edges, mid green with a little yellow-green.
@@ -109,7 +109,7 @@ Grows in wet ground along rivers.
 
 ## Ipê-amarelo in bloom (*Handroanthus*) — `ipe_views.png`
 
-**Target box:** 20 × 20 × 20 voxels. A rare accent in the forest.
+**Target box:** 27 × 27 × 27 voxels. A rare accent in the forest.
 
 **Look:** in the dry season (around July–September) the ipê drops its leaves and is covered in
 **bright yellow flowers**: a dark twisting trunk and branches under an airy, rounded crown of
@@ -129,7 +129,7 @@ Grows in wet ground along rivers.
 
 ## Embaúba (*Cecropia*) — `embauba_views.png`
 
-**Target box:** 16 × 16 × 18 voxels.
+**Target box:** 21 × 21 × 24 voxels.
 
 **Look:** a pioneer tree of clearings and roadsides: a **thin, pale, almost white segmented
 trunk**, a few branches rising like a **candelabra**, each ending in a cluster of **huge
@@ -153,7 +153,7 @@ separate leaf clusters, not one solid crown.
 
 ## Undergrowth shrub — `shrub_views.png`
 
-**Target box:** 10 × 10 × 6 voxels. Small, low, everywhere under the trees.
+**Target box:** 13 × 13 × 8 voxels. Small, low, everywhere under the trees.
 
 **Look:** a low, round, dense bush of dark and mid greens with a few lighter leaves on top; no
 visible trunk.

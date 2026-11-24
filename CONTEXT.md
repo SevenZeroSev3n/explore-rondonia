@@ -53,7 +53,7 @@ See `docs/adr/`. Summary:
 3. Geography from real data (OSM + IBGE) through a Python pipeline into game JSON; uniform scale
    tuned so BR-364 end to end takes ~8 minutes of manual driving.
 4. Art: AI 4-view sheets sliced by the pipeline + procedural vegetation/buildings/terrain.
-5. Look: 480×270 internal resolution, ~32-colour fixed palette, outline on the whole stack.
+5. Look: 640×360 internal resolution, ~32-colour fixed palette, outline on the whole stack.
 6. Content as data, bilingual; photos from Wikimedia Commons.
 7. Public GitHub repo `explore-rondonia`, Actions → GitHub Pages (dev build), itch.io for
    releases; pytest + GUT for pure logic.

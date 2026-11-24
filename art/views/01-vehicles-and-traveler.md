@@ -10,7 +10,7 @@ complete; paste it as is.
 **In the game:** the player's vehicle on the state map, always on screen, rotating freely as you
 drive BR-364. It is the most-seen object in the game: worth the extra tries.
 
-**Target box:** 20 wide × 36 long × 9 tall voxels (long and low).
+**Target box:** 27 wide × 48 long × 12 tall voxels (long and low).
 
 **What it should look like:** a generic, modern compact pickup like the ones on every road in
 Rondônia: white body, short hood, double cab with dark windows, an **open cargo bed** at the back,
@@ -47,7 +47,7 @@ bumpers and tyres `#3a363c` / `#222024`, headlights `#faecaa`, tail lights `#c43
 **In the game:** the player walking inside dioramas (the Madeira-Mamoré railway yard). Tiny on
 screen, so it must read by colour and silhouette alone.
 
-**Target box:** 8 wide × 8 long × 14 tall voxels (a person, about 8 px wide on screen).
+**Target box:** 11 wide × 11 long × 19 tall voxels (a person, about 11 px wide on screen).
 
 **What it should look like:** a friendly traveler: straw hat with a wide brim, orange or red
 shirt, blue trousers, brown shoes, a small backpack on the back. Arms down along the body,
@@ -69,7 +69,7 @@ backpack `#6b4a2e`.
 
 **Notes:**
 
-- At 8×8×14, only the big colour blocks survive: hat on top, shirt, trousers. Do not spend tries
+- At 11×11×19, only the big colour blocks survive: hat on top, shirt, trousers. Do not spend tries
   on faces.
 - The TOP view must show the hat brim round and **bigger than the body**, otherwise the hat gets
   carved to the body's width.

@@ -8,17 +8,17 @@ signal exit_requested
 
 const TRAVELER_SCENE := preload("res://scenes/traveler.tscn")
 const TRUCK_SHEET := preload("res://assets/stacks/truck/truck_slices.png")
-const SIZE := Vector2(560, 360)
-const RIVER_EDGE_Y := -120.0
-const RAIL_Y := -40.0
-const TRUCK_POS := Vector2(40, 140)
-const EXIT_RADIUS := 26.0
+const SIZE := Vector2(747, 480)
+const RIVER_EDGE_Y := -160.0
+const RAIL_Y := -53.0
+const TRUCK_POS := Vector2(53, 187)
+const EXIT_RADIUS := 35.0
 const TURN_SPEED := 1.8                ## rad/s
 ## The camera looks a little ahead of the traveler (up on screen), so what you face
 ## sits in the middle of the viewfinder instead of half out of it.
-const LOOK_AHEAD := 40.0
+const LOOK_AHEAD := 53.0
 ## Slice counts of the sheets in assets/stacks (see tools/make_placeholder_stacks.py).
-const SLICES := {"locomotive": 17, "shed": 20, "water_tower": 36}
+const SLICES := {"locomotive": 23, "shed": 27, "water_tower": 48}
 
 const GRASS := Color("5d8a48")
 const SAND := Color("c9b07a")
@@ -46,7 +46,7 @@ func _ready() -> void:
 	_place_truck()
 	_place_landmarks()
 	traveler = TRAVELER_SCENE.instantiate()
-	traveler.position = TRUCK_POS + Vector2(22, 0)
+	traveler.position = TRUCK_POS + Vector2(29, 0)
 	_entities.add_child(traveler)
 	camera = Camera2D.new()
 	camera.ignore_rotation = false
@@ -124,29 +124,29 @@ func _build_ground() -> void:
 	var ground := Node2D.new()
 	ground.z_index = RenderingServer.CANVAS_ITEM_Z_MIN
 	add_child(ground)
-	var margin := 400.0   # scenery beyond the walls, so turning the view never shows the void
-	ground.add_child(_poly([Vector2(-half.x - margin, RIVER_EDGE_Y + 18), Vector2(half.x + margin, RIVER_EDGE_Y + 18),
+	var margin := 533.0   # scenery beyond the walls, so turning the view never shows the void
+	ground.add_child(_poly([Vector2(-half.x - margin, RIVER_EDGE_Y + 24), Vector2(half.x + margin, RIVER_EDGE_Y + 24),
 		Vector2(half.x + margin, half.y + margin), Vector2(-half.x - margin, half.y + margin)], GRASS))
 	ground.add_child(_poly([Vector2(-half.x - margin, RIVER_EDGE_Y), Vector2(half.x + margin, RIVER_EDGE_Y),
-		Vector2(half.x + margin, RIVER_EDGE_Y + 18), Vector2(-half.x - margin, RIVER_EDGE_Y + 18)], SAND))
+		Vector2(half.x + margin, RIVER_EDGE_Y + 24), Vector2(-half.x - margin, RIVER_EDGE_Y + 24)], SAND))
 	ground.add_child(_poly([Vector2(-half.x - margin, -half.y - margin), Vector2(half.x + margin, -half.y - margin),
 		Vector2(half.x + margin, RIVER_EDGE_Y), Vector2(-half.x - margin, RIVER_EDGE_Y)], WATER))
 	var x := -half.x
 	while x <= half.x:
 		var sleeper := Line2D.new()
-		sleeper.points = PackedVector2Array([Vector2(x, RAIL_Y - 6), Vector2(x, RAIL_Y + 6)])
-		sleeper.width = 2.0
+		sleeper.points = PackedVector2Array([Vector2(x, RAIL_Y - 8), Vector2(x, RAIL_Y + 8)])
+		sleeper.width = 3.0
 		sleeper.default_color = SLEEPER
 		ground.add_child(sleeper)
-		x += 8.0
-	for dy in [-3.0, 3.0]:
+		x += 11.0
+	for dy in [-4.0, 4.0]:
 		var rail := Line2D.new()
 		rail.points = PackedVector2Array([Vector2(-half.x, RAIL_Y + dy), Vector2(half.x, RAIL_Y + dy)])
 		rail.width = 1.0
 		rail.default_color = RAIL
 		ground.add_child(rail)
 	# Walls: the river and the edges of the diorama.
-	_wall(Rect2(-half.x, -half.y - 40, SIZE.x, half.y + 40 + RIVER_EDGE_Y + 4))
+	_wall(Rect2(-half.x, -half.y - 40, SIZE.x, half.y + 40 + RIVER_EDGE_Y + 5))
 	_wall(Rect2(-half.x - 40, -half.y, 40, SIZE.y))
 	_wall(Rect2(half.x, -half.y, 40, SIZE.y))
 	_wall(Rect2(-half.x, half.y, SIZE.x, 40))
@@ -155,7 +155,7 @@ func _build_ground() -> void:
 func _place_truck() -> void:
 	var truck := SpriteStack.new()
 	truck.sheet = TRUCK_SHEET
-	truck.slice_count = 9
+	truck.slice_count = 12
 	truck.angle = -PI / 2.0
 	truck.position = TRUCK_POS
 	_entities.add_child(truck)
@@ -181,7 +181,7 @@ func _place_landmarks() -> void:
 			var body := StaticBody2D.new()
 			var shape := CollisionShape2D.new()
 			var circle := CircleShape2D.new()
-			circle.radius = 9.0 if offsets.size() > 1 else float(spots[-1].radius) * 0.7
+			circle.radius = 12.0 if offsets.size() > 1 else float(spots[-1].radius) * 0.7
 			shape.shape = circle
 			body.add_child(shape)
 			body.position = s.position

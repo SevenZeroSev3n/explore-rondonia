@@ -57,7 +57,7 @@ class Builder:
 
 
 def locomotive() -> vox.Model:
-    """Early-1900s narrow-gauge steam locomotive, 18 x 40 x 17 (art/views/02-madeira-mamore.md).
+    """Early-1900s narrow-gauge steam locomotive, 24 x 53 x 23 (art/views/02-madeira-mamore.md).
 
     Boiler and smokestack at the front, four pairs of red-spoked driving wheels joined by a side
     rod, a slatted cowcatcher, and an open cab at the back with real window holes and an open
@@ -69,79 +69,89 @@ def locomotive() -> vox.Model:
         "lamp": "#f0dc8c", "fire": "#d86a2a",
     })
 
-    # Driving wheels: discs in the (r, z) plane, two voxels thick on each side.
-    for centre in (10, 17, 24, 31):
-        for r in range(centre - 3, centre + 3):
-            for z in range(0, 6):
-                d = ((r + 0.5 - centre) ** 2 + (z + 0.5 - 3) ** 2) ** 0.5
-                if d > 3.0:
+    # Driving wheels: discs in the (r, z) plane (radius 4), two voxels thick on each side, with an
+    # iron tyre, eight red spokes and a brass hub.
+    for centre in (14, 23, 32, 41):
+        for r in range(centre - 4, centre + 4):
+            for z in range(0, 8):
+                dr, dz = r + 0.5 - centre, z + 0.5 - 4
+                d = (dr * dr + dz * dz) ** 0.5
+                if d > 4.0:
                     continue
-                colour = "iron" if d >= 2.2 else "brass" if d < 0.9 else "red"
-                for x in (1, 2, 15, 16):
+                if d >= 3.1:
+                    colour = "iron"
+                elif d < 1.2:
+                    colour = "brass"
+                elif abs(dr) < 0.6 or abs(dz) < 0.6 or abs(abs(dr) - abs(dz)) < 0.6:
+                    colour = "red"
+                else:
+                    colour = "red_dark"
+                for x in (2, 3, 20, 21):
                     b.put(x, r, z, colour)
-    b.box(0, 0, 10, 31, 2, 2, "iron_light")             # side rods joining the wheels
-    b.box(17, 17, 10, 31, 2, 2, "iron_light")
+    b.box(1, 1, 14, 41, 3, 3, "iron_light")             # side rods joining the wheels
+    b.box(22, 22, 14, 41, 3, 3, "iron_light")
 
-    b.box(3, 14, 3, 38, 2, 5, "iron")                   # frame between the wheels
-    b.box(1, 16, 3, 38, 6, 6, "iron_light")             # running board / cab floor
-    b.box(1, 1, 3, 27, 6, 6, "red")                     # red edge along the running board
-    b.box(16, 16, 3, 27, 6, 6, "red")
-    for r in (3, 39):                                   # buffer beams
-        b.box(1, 16, r, r, 3, 5, "red")
-    b.box(8, 9, 39, 39, 3, 3, "brass")                  # rear coupler
+    b.box(4, 19, 4, 51, 3, 7, "iron")                   # frame between the wheels
+    b.box(1, 22, 4, 52, 8, 8, "iron_light")             # running board / cab floor
+    b.box(1, 1, 4, 36, 8, 8, "red")                     # red edge along the running board
+    b.box(22, 22, 4, 36, 8, 8, "red")
+    for r in (4, 52):                                   # buffer beams
+        b.box(1, 22, r, r, 4, 7, "red")
+    b.box(11, 12, 52, 52, 5, 5, "brass")                # rear coupler
 
-    for r, (x0, x1, top) in enumerate([(6, 11, 2), (4, 13, 3), (2, 15, 4)]):  # cowcatcher slats
+    slats = [(8, 15, 2), (6, 17, 3), (4, 19, 4), (3, 20, 5)]
+    for r, (x0, x1, top) in enumerate(slats):           # cowcatcher, sloping up to the beam
         for x in range(x0, x1 + 1):
             b.box(x, x, r, r, 0, top, "red" if x % 2 else "red_dark")
-    b.box(8, 9, 2, 2, 4, 4, "brass")                    # front coupler
+    b.box(11, 12, 3, 3, 6, 6, "brass")                  # front coupler
 
-    b.box(1, 3, 3, 7, 3, 5, "iron_light")               # cylinders
-    b.box(14, 16, 3, 7, 3, 5, "iron_light")
-    b.box(1, 3, 3, 3, 4, 4, "brass")
-    b.box(14, 16, 3, 3, 4, 4, "brass")
+    b.box(1, 4, 5, 10, 4, 7, "iron_light")              # cylinders
+    b.box(19, 22, 5, 10, 4, 7, "iron_light")
+    b.box(1, 4, 5, 5, 5, 6, "brass")
+    b.box(19, 22, 5, 5, 5, 6, "brass")
 
-    # Boiler: a slightly wide cylinder along r (z 7..12), darker smokebox at the front, brass bands.
-    for r in range(3, 28):
-        for x in range(18):
-            for z in range(7, 13):
-                if ((x + 0.5 - 9) / 3.8) ** 2 + ((z + 0.5 - 10) / 3.2) ** 2 <= 1:
-                    colour = "iron_dark" if r <= 7 else "brass" if r in (12, 20) else "iron"
+    # Boiler: a slightly wide cylinder along r (z 9..17), darker smokebox at the front, brass bands.
+    for r in range(4, 37):
+        for x in range(24):
+            for z in range(9, 18):
+                if ((x + 0.5 - 12) / 5.1) ** 2 + ((z + 0.5 - 13.4) / 4.3) ** 2 <= 1:
+                    colour = "iron_dark" if r <= 10 else "brass" if r in (16, 27, 36) else "iron"
                     b.put(x, r, z, colour)
-    b.box(8, 9, 3, 3, 9, 10, "brass")                   # smokebox door handle
-    b.box(4, 4, 8, 26, 11, 11, "iron_light")            # handrails
-    b.box(13, 13, 8, 26, 11, 11, "iron_light")
+    b.box(11, 12, 4, 4, 12, 13, "brass")                # smokebox door handle
+    b.box(6, 6, 11, 35, 15, 15, "iron_light")           # handrails
+    b.box(17, 17, 11, 35, 15, 15, "iron_light")
 
-    b.box(8, 9, 3, 4, 13, 13, "brass")                  # headlamp
-    b.box(8, 9, 3, 3, 13, 13, "lamp")
-    b.box(7, 10, 5, 8, 13, 15, "iron")                  # smokestack
-    b.box(6, 11, 4, 9, 16, 16, "iron_light")            # flared top, dark inside
-    b.box(7, 10, 5, 8, 16, 16, "iron_dark")
+    b.box(11, 12, 4, 5, 18, 19, "brass")                # headlamp
+    b.box(11, 12, 4, 4, 18, 19, "lamp")
+    b.box(10, 13, 7, 10, 18, 21, "iron")                # smokestack
+    b.box(9, 14, 6, 11, 22, 22, "iron_light")           # flared top, dark inside
+    b.box(10, 13, 7, 10, 22, 22, "iron_dark")
 
-    b.box(7, 10, 14, 17, 13, 13, "iron")                # steam dome with a brass cap
-    for x, r in ((7, 14), (10, 14), (7, 17), (10, 17)):
-        b.put(x, r, 13, None)
-    b.box(8, 9, 15, 16, 14, 14, "brass")
-    b.box(8, 9, 21, 22, 13, 13, "iron")                 # sand dome
-    b.box(9, 9, 26, 26, 13, 14, "brass")                # whistle
+    b.box(10, 13, 19, 22, 18, 19, "iron")               # steam dome with a brass cap
+    for x, r in ((10, 19), (13, 19), (10, 22), (13, 22)):
+        b.put(x, r, 19, None)
+    b.box(11, 12, 20, 21, 20, 20, "brass")
+    b.box(11, 12, 28, 29, 18, 18, "iron")               # sand dome
+    b.box(12, 12, 35, 35, 18, 20, "brass")              # whistle
 
     # Cab: red lower panels, iron upper walls with window holes, open rear, overhanging roof.
-    b.box(1, 16, 28, 39, 7, 13, "iron")
-    b.box(2, 15, 29, 38, 7, 13, None)                   # hollow inside
-    b.box(1, 1, 28, 39, 7, 9, "red")
-    b.box(16, 16, 28, 39, 7, 9, "red")
-    b.box(1, 16, 28, 28, 7, 9, "red")
-    for x in (1, 16):                                   # side windows, a pillar between them
-        b.box(x, x, 30, 32, 10, 12, None)
-        b.box(x, x, 34, 37, 10, 12, None)
-    b.box(2, 4, 28, 28, 11, 12, None)                   # front windows beside the boiler
-    b.box(13, 15, 28, 28, 11, 12, None)
-    b.box(5, 12, 39, 39, 7, 12, None)                   # open rear
-    b.box(6, 11, 29, 29, 7, 12, "iron_dark")            # backhead inside the cab
-    b.box(8, 9, 29, 29, 8, 8, "fire")                   # firebox door glow
-    b.box(7, 7, 29, 29, 11, 11, "brass")                # gauges
-    b.box(10, 10, 29, 29, 11, 11, "brass")
-    b.box(0, 17, 27, 39, 14, 14, "roof")
-    b.box(2, 15, 28, 38, 15, 15, "roof_light")
+    b.box(1, 22, 37, 52, 9, 18, "iron")
+    b.box(2, 21, 38, 51, 9, 18, None)                   # hollow inside
+    b.box(1, 1, 37, 52, 9, 12, "red")
+    b.box(22, 22, 37, 52, 9, 12, "red")
+    b.box(1, 22, 37, 37, 9, 12, "red")
+    for x in (1, 22):                                   # side windows, a pillar between them
+        b.box(x, x, 40, 43, 13, 16, None)
+        b.box(x, x, 46, 50, 13, 16, None)
+    b.box(2, 5, 37, 37, 14, 16, None)                   # front windows beside the boiler
+    b.box(18, 21, 37, 37, 14, 16, None)
+    b.box(6, 17, 52, 52, 9, 16, None)                   # open rear
+    b.box(8, 15, 38, 38, 9, 16, "iron_dark")            # backhead inside the cab
+    b.box(11, 12, 38, 38, 10, 11, "fire")               # firebox door glow
+    b.box(9, 9, 38, 38, 15, 15, "brass")                # gauges
+    b.box(14, 14, 38, 38, 15, 15, "brass")
+    b.box(0, 23, 36, 52, 19, 19, "roof")
+    b.box(2, 21, 37, 51, 20, 20, "roof_light")
     return b.model()
 
 

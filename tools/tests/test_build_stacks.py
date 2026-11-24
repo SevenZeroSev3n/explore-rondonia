@@ -29,15 +29,17 @@ def write_box(path, size):
 
 
 def test_a_vox_model_wins_over_the_placeholder(dirs):
-    write_box(dirs / "VOX/shrub.vox", (10, 10, 6))
+    W, L, H, _ = build_stacks.STACKS["shrub"]
+    write_box(dirs / "VOX/shrub.vox", (W, L, H))
     assert "from VOX/shrub.vox" in build_stacks.build("shrub")
     sheet = Image.open(dirs / "OUT/shrub/shrub_slices.png")
-    assert sheet.size == (60, 10)
+    assert sheet.size == (W * H, L)
     assert sheet.getpixel((0, 0)) == RED
 
 
 def test_a_vox_model_of_the_wrong_size_is_refused(dirs):
-    write_box(dirs / "VOX/shrub.vox", (10, 10, 5))
+    W, L, H, _ = build_stacks.STACKS["shrub"]
+    write_box(dirs / "VOX/shrub.vox", (W, L, H - 1))
     with pytest.raises(SystemExit, match="contract"):
         build_stacks.build("shrub")
 
