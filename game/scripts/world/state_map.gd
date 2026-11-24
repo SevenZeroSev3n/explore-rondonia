@@ -251,7 +251,6 @@ func _place_towns() -> void:
 		var label := Label.new()
 		label.text = t.name
 		label.position = Vector2(r + 3, -8)
-		label.add_theme_font_size_override("font_size", 8)
 		label.add_theme_color_override("font_outline_color", Color.BLACK)
 		label.add_theme_constant_override("outline_size", 3)
 		marker.add_child(label)

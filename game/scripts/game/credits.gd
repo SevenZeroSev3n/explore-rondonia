@@ -19,7 +19,7 @@ static func source_hosts(catalog: PlaceCatalog) -> PackedStringArray:
 
 ## The credit lines in display order; `t` translates a string key (tr).
 static func lines(t: Callable, map_attribution: PackedStringArray, hosts: PackedStringArray) -> PackedStringArray:
-	var out: PackedStringArray = [t.call("CREDITS_CODE"), t.call("CREDITS_ENGINE")]
+	var out: PackedStringArray = [t.call("CREDITS_CODE"), t.call("CREDITS_ENGINE"), t.call("CREDITS_FONT")]
 	out.append_array(map_attribution)
 	out.append(t.call("CREDITS_SOURCES") % ", ".join(hosts))
 	return out

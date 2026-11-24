@@ -8,7 +8,9 @@ extends CanvasLayer
 signal teleport_requested(city: String)
 signal shutter_pressed(frame_screen: Rect2)
 
-const FONT_SIZE := 8
+## Text uses the project theme (assets/ui_theme.tres): Pixelify Sans at 13 px, the size
+## where its pixel grid lands on whole screen pixels and every Portuguese accent reads.
+const HEADING_COLOR := Color("f2d04a")
 const VIEWFINDER := Vector2(240, 150)   ## screen px, centred
 
 var stamp_cities: PackedStringArray = []
@@ -66,14 +68,17 @@ func _ready() -> void:
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_root.theme = Theme.new()
-	_root.theme.default_font_size = FONT_SIZE
 	add_child(_root)
 
-	_counter = _label(_root, Vector2(6, 4))
-	_landmarks_counter = _label(_root, Vector2(6, 14))
-	_secrets_counter = _label(_root, Vector2(6, 24))
-	_key_hint = _label(_root, Vector2(6, 34))
+	_counter = _label(_root, Vector2(6, 2))
+	_landmarks_counter = _label(_root, Vector2(6, 17))
+	_secrets_counter = _label(_root, Vector2(6, 32))
+	# Key hints sit on the bottom line; standing prompts ("Enter: ...") just above them.
+	_key_hint = _label(_root, Vector2.ZERO)
+	_key_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_key_hint.offset_top = -17
+	_key_hint.offset_bottom = -2
+	_key_hint.offset_left = 6
 	_key_hint.modulate = Color(1, 1, 1, 0.7)
 
 	_lang = Button.new()
@@ -89,28 +94,27 @@ func _ready() -> void:
 	_toast = _label(_root, Vector2.ZERO)
 	# Full width under the counters, text centred: anchors + offsets, not a raw position.
 	_toast.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	_toast.offset_top = 48
-	_toast.offset_bottom = 62
+	_toast.offset_top = 50
+	_toast.offset_bottom = 66
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_toast.add_theme_font_size_override("font_size", 10)
 	_toast.modulate.a = 0.0
 
 	_prompt = _label(_root, Vector2.ZERO)
 	_prompt.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	_prompt.offset_top = -22
-	_prompt.offset_bottom = -8
+	_prompt.offset_top = -36
+	_prompt.offset_bottom = -20
 	_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 	_build_panel()
 	_build_sheet()
-	_tutorial = _build_info(300)
+	_tutorial = _build_info(430)
 	_tutorial.button.pressed.connect(close_tutorial)
-	_complete = _build_info(300)
+	_complete = _build_info(380)
 	_complete.button.pressed.connect(func() -> void: _hide_info(_complete))
 	_complete.button2.pressed.connect(func() -> void:
 		_hide_info(_complete)
 		show_credits())
-	_credits = _build_info(320)
+	_credits = _build_info(420)
 	_credits.button.pressed.connect(func() -> void: _hide_info(_credits))
 	I18n.locale_changed.connect(func(_l: String) -> void: refresh())
 	SaveStore.passport.stamped.connect(func(_c: String) -> void: refresh())
@@ -291,6 +295,9 @@ func _update_pause() -> void:
 		if not info.is_empty() and info.panel.visible:
 			info_open = true
 	get_tree().paused = _panel.visible or _sheet.visible or info_open
+	# The HUD behind a panel would show through it and compete with its text.
+	for l in [_counter, _landmarks_counter, _secrets_counter, _key_hint, _prompt]:
+		l.visible = not get_tree().paused
 	if get_tree().paused:
 		if _toast_tween:
 			_toast_tween.kill()
@@ -363,7 +370,7 @@ func _fill_infos() -> void:
 
 
 func _build_info(width: float) -> Dictionary:
-	var panel := _centred_panel(Vector2(width, 0), Vector2(-width / 2.0, -120))
+	var panel := _centred_panel(Vector2(width, 0))
 	var box := panel.get_child(0).get_child(0) as VBoxContainer
 	var title := _heading(box)
 	var body := Label.new()
@@ -412,12 +419,12 @@ func _build_viewfinder() -> void:
 
 
 func _build_panel() -> void:
-	_panel = _centred_panel(Vector2(270, 0), Vector2(-135, -128))
+	_panel = _centred_panel(Vector2(360, 0))
 	var box := _panel.get_child(0).get_child(0) as VBoxContainer
 	_title = _heading(box)
 	# The lists scroll; title and buttons stay put, so the panel fits 270 px with any content.
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, 150)
+	scroll.custom_minimum_size = Vector2(0, 136)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.follow_focus = true
 	box.add_child(scroll)
@@ -452,7 +459,7 @@ func _build_panel() -> void:
 
 
 func _build_sheet() -> void:
-	_sheet = _centred_panel(Vector2(300, 0), Vector2(-150, -115))
+	_sheet = _centred_panel(Vector2(410, 0))
 	var box := _sheet.get_child(0).get_child(0) as VBoxContainer
 	_sheet_title = _heading(box)
 	_sheet_photo = _dim("")
@@ -462,7 +469,7 @@ func _build_sheet() -> void:
 	box.add_child(_sheet_photo)
 	_sheet_text = Label.new()
 	_sheet_text.autowrap_mode = TextServer.AUTOWRAP_WORD
-	_sheet_text.custom_minimum_size = Vector2(284, 0)
+	_sheet_text.custom_minimum_size = Vector2(394, 0)
 	box.add_child(_sheet_text)
 	_sheet_sources = _dim("")
 	_sheet_sources.autowrap_mode = TextServer.AUTOWRAP_WORD
@@ -472,13 +479,15 @@ func _build_sheet() -> void:
 	box.add_child(_sheet_close)
 
 
-func _centred_panel(min_size: Vector2, offset: Vector2) -> PanelContainer:
+func _centred_panel(min_size: Vector2) -> PanelContainer:
 	var panel := PanelContainer.new()
 	panel.visible = false
-	panel.set_anchors_preset(Control.PRESET_CENTER)
 	panel.custom_minimum_size = min_size
-	panel.position = offset
 	_root.add_child(panel)
+	# Centred and growing both ways, so it stays centred whatever its content's height.
+	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	panel.grow_vertical = Control.GROW_DIRECTION_BOTH
 	var margin := MarginContainer.new()
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 8)
@@ -491,7 +500,7 @@ func _centred_panel(min_size: Vector2, offset: Vector2) -> PanelContainer:
 
 func _heading(box: VBoxContainer) -> Label:
 	var l := Label.new()
-	l.add_theme_font_size_override("font_size", 12)
+	l.add_theme_color_override("font_color", HEADING_COLOR)
 	box.add_child(l)
 	return l
 

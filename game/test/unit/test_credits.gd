@@ -11,9 +11,9 @@ func test_source_hosts_are_unique_sorted_and_without_www() -> void:
 
 
 func test_lines_include_licences_engine_map_data_and_sources() -> void:
-	var t := func(key: String) -> String: return {"CREDITS_CODE": "code", "CREDITS_ENGINE": "engine", "CREDITS_SOURCES": "src: %s"}[key]
+	var t := func(key: String) -> String: return {"CREDITS_CODE": "code", "CREDITS_ENGINE": "engine", "CREDITS_FONT": "font", "CREDITS_SOURCES": "src: %s"}[key]
 	var lines := Credits.lines(t, PackedStringArray(["© OSM"]), PackedStringArray(["a.org", "b.org"]))
-	assert_eq(lines, PackedStringArray(["code", "engine", "© OSM", "src: a.org, b.org"]))
+	assert_eq(lines, PackedStringArray(["code", "engine", "font", "© OSM", "src: a.org, b.org"]))
 
 
 func test_shipped_credits_name_openstreetmap_and_ibge() -> void:

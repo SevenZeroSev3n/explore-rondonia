@@ -30,5 +30,6 @@ docs/      adr/ (decisions), reference/ (guides and local-only reference maps)
 
 ## License
 
-Code: MIT. Original art: CC BY 4.0. Third-party data keeps its own license and is credited
+Code: MIT. Original art: CC BY 4.0. Font: Pixelify Sans, SIL Open Font License 1.1
+(`game/assets/fonts/PixelifySans-OFL.txt`). Third-party data keeps its own license and is credited
 in-game: OpenStreetMap (ODbL), IBGE (public), Wikimedia Commons photos (per-photo CC).
