@@ -20,7 +20,8 @@ from the linked sources and must be re-checked when the place sheet text is writ
    BR-364 photos (e.g. `BR-364emJipa.jpg`, `Ji-Parana01.jpg`); none confirmed to show the station.
    Sources: [IBGE — Ji-Paraná history](https://biblioteca.ibge.gov.br/visualizacao/dtb/rondonia/jiparana.pdf),
    [Iphan advisory council, 25/11/2015](https://www.gov.br/iphan/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/atas-do-conselho-consultivo-do-patrimonio-cultural/de-2011-ate-2020/81a-reuniao-ordinaria-do-conselho-consultivo-25-11-2015).
-3. **Teotônio** — about 40 km from Porto Velho on the Madeira. Free photos on Commons:
+3. **Teotônio** — about 40 km from Porto Velho on the Madeira. In the game since 2026-11-24:
+   the 2007 Agência Brasil photo (CC BY 3.0 BR). Other free photos on Commons:
    `File:Rio Madeira- Cachoeira do Teotônio.jpg`, `File:Fishing at the Teotônio rapids.png`.
    Source: [UNIR — traditional fisheries submerged by the dams (2021)](https://gpbiodiversidadero.unir.br/uploads/32471044/Ictiologia/Alves%20Santanna,%20I.%20R.%20et%20al%202021_PESCARIAS%20TRADICIONAIS%20DA%20CACHOEIRA%20DO%20TEOTONIO%20SUBMERSAS%20PELA%20USINAS%20EM%20RONDONIA..pdf).
 

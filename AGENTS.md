@@ -15,7 +15,9 @@ UI text is PT/EN from `game/data/i18n/strings.json`. Photo mode works on layer 1
 `scripts/game/photo_rules.gd` judges frame, distance and angle window; the three secrets live in
 `game/data/places/*.json` (bilingual text, sources, photo rules) and are projected onto the map by
 `tools/geo/build_map.py` (rerun it after adding or moving a place). A valid photo opens the place
-sheet; real photos are not in yet.
+sheet. Real photos live in `game/assets/photos/` and in each place's `photos` list (author,
+licence, source, bilingual caption; a test enforces it); on the web they are an HTML `<img>` over
+the frame (`scripts/ui/web_photo.gd`). QA: a **debug** web build accepts `?open_sheet=<place id>`.
 
 Layer 2: at Porto Velho, Enter opens the Madeira-Mamoré diorama (`scenes/diorama_efmm.tscn`,
 `scripts/diorama/`): walk on foot, Q/E turn the camera, four landmark photos with a ±30° window

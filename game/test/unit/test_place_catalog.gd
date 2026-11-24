@@ -39,3 +39,27 @@ func test_every_secret_is_on_the_state_map() -> void:
 	var ids := StateMapData.load_file().spots.map(func(s): return s.id)
 	for id in catalog.ids_of_kind("secret"):
 		assert_has(ids, id, "rebuild the map after adding a place: python3 tools/geo/build_map.py")
+
+
+func test_every_photo_is_packed_and_credited() -> void:
+	for id in catalog.places:
+		for photo in catalog.photos_of(id):
+			assert_true(ResourceLoader.exists(photo.file), "%s: %s exists" % [id, photo.file])
+			for key in ["author", "license", "source_url"]:
+				assert_false(str(photo.get(key, "")).is_empty(), "%s photo needs %s (ADR 0006)" % [id, key])
+			for locale in ["en", "pt_BR"]:
+				assert_false(catalog.caption_of(photo, locale).is_empty(), "%s caption %s" % [id, locale])
+
+
+func test_teotonio_has_its_real_photo() -> void:
+	var photos := catalog.photos_of("secret_teotonio")
+	assert_eq(photos.size(), 1)
+	assert_string_contains(photos[0].author, "Agência Brasil")
+	assert_eq(photos[0].license, "CC BY 3.0 BR")
+
+
+func test_photos_of_ignores_bad_data() -> void:
+	var c := PlaceCatalog.new()
+	c.places = {"a": {"photos": "nope"}, "b": {"photos": [{"no_file": 1}, {"file": "x"}]}}
+	assert_eq(c.photos_of("a"), [])
+	assert_eq(c.photos_of("b").size(), 1)

@@ -48,6 +48,19 @@ func sources_of(id: String) -> PackedStringArray:
 	return PackedStringArray(places.get(id, {}).get("sources", []))
 
 
+## Real photos of a place: [{file, author, license, license_url, source_url, year, caption}].
+func photos_of(id: String) -> Array:
+	var raw: Variant = places.get(id, {}).get("photos", [])
+	if typeof(raw) != TYPE_ARRAY:
+		return []
+	return raw.filter(func(p): return typeof(p) == TYPE_DICTIONARY and p.has("file"))
+
+
+func caption_of(photo: Dictionary, locale: String) -> String:
+	var c: Variant = photo.get("caption", {})
+	return str(c.get(locale, c.get("en", ""))) if typeof(c) == TYPE_DICTIONARY else ""
+
+
 func ids_in_diorama(diorama: String) -> PackedStringArray:
 	var out: PackedStringArray = []
 	for id in places:

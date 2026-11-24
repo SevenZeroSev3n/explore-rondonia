@@ -21,3 +21,10 @@ func test_shipped_credits_name_openstreetmap_and_ibge() -> void:
 	var text := "\n".join(m.attribution)
 	assert_string_contains(text, "OpenStreetMap")
 	assert_string_contains(text, "IBGE")
+
+
+func test_photo_lines_credit_every_photo() -> void:
+	var c := PlaceCatalog.new()
+	c.places = {"p": {"name": {"en": "Place"}, "photos": [{"file": "x", "author": "Ana", "license": "CC BY"}]}}
+	var t := func(key: String) -> String: return "Photo, %s: %s (%s)"
+	assert_eq(Credits.photo_lines(t, c, "en"), PackedStringArray(["Photo, Place: Ana (CC BY)"]))

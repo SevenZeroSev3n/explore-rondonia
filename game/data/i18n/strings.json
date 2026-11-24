@@ -42,5 +42,7 @@
   "CREDITS_CODE": {"en": "Code: MIT · Original art: CC BY 4.0", "pt_BR": "Código: MIT · Arte original: CC BY 4.0"},
   "CREDITS_ENGINE": {"en": "Made with Godot Engine (MIT licence)", "pt_BR": "Feito com Godot Engine (licença MIT)"},
   "CREDITS_SOURCES": {"en": "Place texts based on: %s", "pt_BR": "Textos dos lugares baseados em: %s"},
-  "CREDITS_FONT": {"en": "Font: Pixelify Sans by the Pixelify Sans Project Authors (SIL Open Font License 1.1)", "pt_BR": "Fonte: Pixelify Sans, dos autores do projeto Pixelify Sans (SIL Open Font License 1.1)"}
+  "CREDITS_FONT": {"en": "Font: Pixelify Sans by the Pixelify Sans Project Authors (SIL Open Font License 1.1)", "pt_BR": "Fonte: Pixelify Sans, dos autores do projeto Pixelify Sans (SIL Open Font License 1.1)"},
+  "SHEET_PHOTO_CREDIT": {"en": "Photo: %s · %s", "pt_BR": "Foto: %s · %s"},
+  "CREDITS_PHOTO": {"en": "Photo, %s: %s (%s)", "pt_BR": "Foto, %s: %s (%s)"}
 }

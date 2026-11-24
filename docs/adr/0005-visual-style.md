@@ -18,3 +18,5 @@ The guide suggests 320×180, which is too tight to read a map with cities and la
   and "ã" loses its tilde); antialiasing and hinting off; set once in `game/assets/ui_theme.tres`.
 - Place sheets (fichas) are pixel-framed with a bitmap font, but **real photos are shown at full
   resolution, not pixelated**, to mark the contrast between the game and the real place.
+  Implementation (2026-11-24): on the web an HTML `<img>` is laid exactly over the photo frame
+  (`scripts/ui/web_photo.gd`); the desktop build shows the photo inside the 480×270 frame.

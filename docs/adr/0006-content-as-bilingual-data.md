@@ -19,6 +19,13 @@ A large foreign audience is expected. Text in code makes translation and review 
   photos** or **third parties with written permission** (e.g. a park, a city hall). Every photo is
   credited with author and license (or permission) on its sheet and in the credits screen.
 
+## Implementation (2026-11-24)
+
+Each place lists its photos in `photos` (file, author, licence, licence URL, source URL, year,
+bilingual caption). The sheet shows the first one with its caption and credit, and the credits
+screen lists every photo. First photo: Cachoeira do Teotônio, Wilson Dias/Agência Brasil, 2007,
+CC BY 3.0 BR (Wikimedia Commons, 960 px version).
+
 ## Consequences
 
 - Adding a language is adding data, not code.

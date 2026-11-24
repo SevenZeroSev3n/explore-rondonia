@@ -50,7 +50,11 @@ var _close: Button
 var _sheet: PanelContainer
 var _sheet_title: Label
 var _sheet_text: Label
-var _sheet_photo: Label
+var _sheet_photo: Label                ## "[ real photo coming soon ]" when a place has none
+var _sheet_photo_rect: TextureRect     ## the photo frame (in-game texture; the web overlays it)
+var _sheet_photo_credit: Label
+var _sheet_photo_file := ""
+var _photo_rect_shown := Rect2()
 var _sheet_sources: Label
 var _sheet_close: Button
 var _sheet_id := ""
@@ -145,6 +149,20 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif photo_mode and event.is_action_pressed("shoot"):
 		_shoot()
 		get_viewport().set_input_as_handled()
+
+
+func _process(_delta: float) -> void:
+	if not WebPhoto.available():
+		return
+	if not _sheet.visible or _sheet_photo_file.is_empty():
+		if _photo_rect_shown != Rect2():   # the sheet was hidden some other way
+			_photo_rect_shown = Rect2()
+			WebPhoto.hide()
+		return
+	var r := WebPhoto.window_rect(_sheet_photo_rect)
+	if r != _photo_rect_shown:   # first frame after layout, and on window resize
+		_photo_rect_shown = r
+		WebPhoto.show(_sheet_photo_file, r)
 
 
 # --- passport panel -------------------------------------------------------
@@ -249,6 +267,9 @@ func open_sheet(id: String) -> void:
 func close_sheet() -> void:
 	_sheet.visible = false
 	_sheet_id = ""
+	_sheet_photo_file = ""
+	_photo_rect_shown = Rect2()
+	WebPhoto.hide()
 	_update_pause()
 	if _complete_pending:
 		_complete_pending = false
@@ -259,7 +280,19 @@ func _fill_sheet(id: String) -> void:
 	var locale := I18n.current()
 	_sheet_title.text = catalog.name_of(id, locale)
 	_sheet_text.text = catalog.text_of(id, locale)
-	_sheet_photo.text = tr("SHEET_PHOTO_SOON")
+	var photos := catalog.photos_of(id)
+	if photos.is_empty():
+		_sheet_photo_file = ""
+		_sheet_photo_rect.texture = null
+		_sheet_photo.text = tr("SHEET_PHOTO_SOON")
+		_sheet_photo_credit.text = ""
+	else:
+		var photo: Dictionary = photos[0]
+		_sheet_photo_file = photo.file
+		_sheet_photo_rect.texture = load(photo.file)
+		_sheet_photo.text = ""
+		_sheet_photo_credit.text = catalog.caption_of(photo, locale) + "\n" \
+			+ tr("SHEET_PHOTO_CREDIT") % [photo.get("author", "?"), photo.get("license", "?")]
 	var hosts: PackedStringArray = []
 	for url in catalog.sources_of(id):
 		var host := url.trim_prefix("https://").trim_prefix("http://").get_slice("/", 0)
@@ -363,7 +396,8 @@ func _fill_infos() -> void:
 	_complete.button2.text = tr("PASSPORT_CREDITS")
 	_credits.title.text = tr("CREDITS_TITLE")
 	var hosts := Credits.source_hosts(catalog) if catalog else PackedStringArray()
-	_credits.body.text = "\n".join(Credits.lines(tr, map_attribution, hosts))
+	var photo_lines := Credits.photo_lines(tr, catalog, I18n.current()) if catalog else PackedStringArray()
+	_credits.body.text = "\n".join(Credits.lines(tr, map_attribution, hosts, photo_lines))
 	_credits.extra.text = ""
 	_credits.button.text = tr("SHEET_CLOSE")
 	_credits.button2.visible = false
@@ -459,18 +493,34 @@ func _build_panel() -> void:
 
 
 func _build_sheet() -> void:
-	_sheet = _centred_panel(Vector2(410, 0))
+	_sheet = _centred_panel(Vector2(464, 0))
 	var box := _sheet.get_child(0).get_child(0) as VBoxContainer
 	_sheet_title = _heading(box)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	box.add_child(row)
+	# Photo frame (3:2-ish like most photos); the placeholder label sits inside it.
+	_sheet_photo_rect = TextureRect.new()
+	_sheet_photo_rect.custom_minimum_size = Vector2(168, 114)
+	_sheet_photo_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_sheet_photo_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_sheet_photo_rect.clip_contents = true
+	_sheet_photo_rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	row.add_child(_sheet_photo_rect)
 	_sheet_photo = _dim("")
+	_sheet_photo.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_sheet_photo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_sheet_photo.custom_minimum_size = Vector2(0, 40)
 	_sheet_photo.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	box.add_child(_sheet_photo)
+	_sheet_photo.autowrap_mode = TextServer.AUTOWRAP_WORD
+	_sheet_photo_rect.add_child(_sheet_photo)
 	_sheet_text = Label.new()
 	_sheet_text.autowrap_mode = TextServer.AUTOWRAP_WORD
-	_sheet_text.custom_minimum_size = Vector2(394, 0)
-	box.add_child(_sheet_text)
+	_sheet_text.custom_minimum_size = Vector2(272, 0)
+	_sheet_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(_sheet_text)
+	_sheet_photo_credit = _dim("")
+	_sheet_photo_credit.autowrap_mode = TextServer.AUTOWRAP_WORD
+	box.add_child(_sheet_photo_credit)
 	_sheet_sources = _dim("")
 	_sheet_sources.autowrap_mode = TextServer.AUTOWRAP_WORD
 	box.add_child(_sheet_sources)

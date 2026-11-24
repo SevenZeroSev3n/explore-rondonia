@@ -81,6 +81,7 @@ func _ready() -> void:
 	truck.model.heading = map.road_heading(0)
 	if not SaveStore.has_flag("tutorial_seen"):
 		hud.show_tutorial.call_deferred()
+	_qa_hooks.call_deferred()
 
 
 func _process(_delta: float) -> void:
@@ -104,6 +105,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	if diorama == null and event.is_action_pressed("interact") and near_diorama():
 		get_viewport().set_input_as_handled()
 		enter_diorama()
+
+
+## QA only, debug web builds: ?open_sheet=<place id> opens that sheet, to check photos
+## without playing to them. Release builds (Pages, itch.io) never run this.
+func _qa_hooks() -> void:
+	if not (OS.is_debug_build() and OS.has_feature("web")):
+		return
+	var id: Variant = JavaScriptBridge.eval("new URLSearchParams(location.search).get('open_sheet')")
+	if typeof(id) == TYPE_STRING and catalog.has(id):
+		hud.close_tutorial()
+		hud.open_sheet(id)
 
 
 ## ADR 0008 ending: 4 stamps + 4 Madeira-Mamoré photos + the 3 secrets. Shown once;

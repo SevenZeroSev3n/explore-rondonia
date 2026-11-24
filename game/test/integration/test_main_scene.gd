@@ -110,3 +110,14 @@ func test_completing_the_passport_shows_the_ending_after_the_last_sheet() -> voi
 	assert_true(world.check_complete())
 	await wait_process_frames(2)
 	assert_false(world.hud.is_showing("complete"), "shown once")
+
+
+func test_sheet_shows_the_real_photo_or_the_placeholder() -> void:
+	world.hud.open_sheet("secret_teotonio")
+	assert_not_null(world.hud._sheet_photo_rect.texture, "Teotônio has a real photo")
+	assert_string_contains(world.hud._sheet_photo_credit.text, "CC BY 3.0 BR")
+	world.hud.close_sheet()
+	world.hud.open_sheet("secret_mandi")
+	assert_null(world.hud._sheet_photo_rect.texture, "Mandi has no photo yet")
+	assert_ne(world.hud._sheet_photo.text, "")
+	world.hud.close_sheet()
