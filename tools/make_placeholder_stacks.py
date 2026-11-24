@@ -388,6 +388,148 @@ def shrub_slices(seed: int = 29) -> list[Image.Image]:
     return out
 
 
+# --- ADR 0009: road-trip roadside ---------------------------------------------------------
+BABACU_FROND = [(70, 116, 52, 255), (92, 140, 62, 255), (122, 162, 78, 255)]
+BABACU_TRUNK = (118, 104, 86, 255)
+NELORE = (226, 224, 216, 255)
+NELORE_SHADE = (196, 192, 184, 255)
+HOOF = (60, 56, 52, 255)
+CAPY = (132, 96, 64, 255)
+CAPY_DARK = (104, 74, 50, 255)
+STATION_ROOF = (232, 232, 226, 255)
+STATION_STRIPE = (40, 120, 70, 255)
+STATION_PUMP = (210, 60, 46, 255)
+STATION_FLOOR = (150, 150, 150, 255)
+POST = (110, 82, 54, 255)
+
+
+def babacu_slices() -> list[Image.Image]:
+    """Babaçu palm: straight trunk, a fountain of long feathery fronds. 24x24, 32 slices."""
+    out = []
+    c = 11.5
+    for z in range(32):
+        s = blank(24, 24)
+        if z <= 24:
+            _trunk(s, 11, 11, 2, BABACU_TRUNK)
+        if z >= 20:
+            t = (z - 20) / 11
+            r = 11.5 * math.sqrt(max(0.0, 1 - (2 * t - 0.6) ** 2))
+            for y in range(24):
+                for x in range(24):
+                    d = math.hypot(x - c, y - c)
+                    a = math.atan2(y - c, x - c)
+                    if d <= r and (math.cos(a * 7) > 0.2 or d < 2.5):   # seven arching fronds
+                        s.putpixel((x, y), BABACU_FROND[min(2, int(t * 3))])
+        out.append(s)
+    return out
+
+
+def sumauma_slices(seed: int = 31) -> list[Image.Image]:
+    """Sumaúma (kapok): buttress roots, tall pale trunk, wide flat emergent crown. 40x40, 48 slices."""
+    rng = random.Random(seed)
+    out = []
+    for z in range(48):
+        s = blank(40, 40)
+        if z <= 5:                                      # buttress roots fanning out
+            reach = 9 - z
+            for a in range(6):
+                ang = a * math.pi / 3
+                for k in range(reach + 1):
+                    x, y = round(19.5 + math.cos(ang) * (2 + k)), round(19.5 + math.sin(ang) * (2 + k))
+                    rect(s, x, y, x, y, BARK_LIGHT)
+        if z <= 38:
+            _trunk(s, 19, 19, 3 if z < 30 else 2, BARK_LIGHT)
+        if z >= 34:
+            t = (z - 34) / 13
+            _blob(s, 19.5, 19.5, 19.0 * math.sqrt(max(0.0, 1 - (2 * t - 0.4) ** 2)), LEAF, rng, t)
+        out.append(s)
+    return out
+
+
+def cattle_slices() -> list[Image.Image]:
+    """Nelore cow, white with a hump, head at the front (top). 8x20, 13 slices."""
+    out = []
+    for z in range(13):
+        s = blank(8, 20)
+        if z <= 5:                                      # four legs
+            for x0 in (1, 5):
+                for y0 in (4, 15):
+                    rect(s, x0, y0, x0 + 1, y0 + 1, HOOF if z == 0 else NELORE_SHADE)
+        if 6 <= z <= 10:
+            rect(s, 1, 3, 6, 17, NELORE if z < 10 else NELORE_SHADE)   # body
+        if z == 8:
+            rect(s, 3, 18, 4, 19, NELORE_SHADE)         # tail root
+        if 8 <= z <= 11:
+            rect(s, 2, 0, 5, 3, NELORE)                 # head reaching forward
+        if z == 11 or z == 12:
+            rect(s, 2, 5, 5, 7, NELORE)                 # the Nelore hump
+        if z == 12:
+            rect(s, 1, 1, 1, 1, HOOF)                   # ears/horns
+            rect(s, 6, 1, 6, 1, HOOF)
+        out.append(s)
+    return out
+
+
+def capybara_slices() -> list[Image.Image]:
+    """Capybara: a brown barrel on short legs, blunt head at the front. 6x11, 6 slices."""
+    out = []
+    for z in range(6):
+        s = blank(6, 11)
+        if z <= 1:
+            for x0 in (1, 4):
+                for y0 in (2, 8):
+                    rect(s, x0, y0, x0, y0, CAPY_DARK)
+        if 2 <= z <= 5:
+            inset = 1 if z == 5 else 0
+            rect(s, 0 + inset, 2, 5 - inset, 10 - inset, CAPY if z < 5 else CAPY_DARK)
+        if 3 <= z <= 5:
+            rect(s, 1, 0, 4, 2, CAPY)                   # head
+        out.append(s)
+    return out
+
+
+def fuel_station_slices() -> list[Image.Image]:
+    """Roadside petrol station: concrete apron, two pump islands, a canopy on four columns,
+    and a small shop at the back. Front (the road side) at the top. 64x48, 24 slices."""
+    out = []
+    for z in range(24):
+        s = blank(64, 48)
+        if z == 0:
+            rect(s, 0, 0, 63, 47, STATION_FLOOR)        # apron
+        if 1 <= z <= 6:
+            for x0 in (18, 40):                         # pump islands with red pumps
+                rect(s, x0, 14, x0 + 5, 19, STATION_PUMP if z >= 2 else STATION_FLOOR)
+        if 1 <= z <= 15:
+            for x0, y0 in ((10, 8), (52, 8), (10, 24), (52, 24)):
+                rect(s, x0, y0, x0 + 1, y0 + 1, STATION_ROOF)   # canopy columns
+        if z in (16, 17):
+            rect(s, 6, 4, 57, 28, STATION_STRIPE if z == 16 else STATION_ROOF)   # canopy
+        if 1 <= z <= 12:
+            outline(s, 14, 34, 49, 46, BRICK if z < 12 else ROOF)   # shop walls
+            if z <= 8:
+                rect(s, 28, 34, 35, 34, CLEAR)                       # shop door
+        if z in (13, 14):
+            rect(s, 13, 33, 50, 47, ROOF_DARK)          # shop roof
+        if 1 <= z <= 23:
+            rect(s, 58, 40, 59, 41, IRON_LIGHT)         # price sign pole
+        if 18 <= z <= 23:
+            rect(s, 55, 39, 62, 42, STATION_STRIPE if z % 2 else STATION_ROOF)   # sign board
+        out.append(s)
+    return out
+
+
+def fence_post_slices() -> list[Image.Image]:
+    """A wooden fence post (mourão). 3x3, 10 slices; the wire is drawn by the game."""
+    out = []
+    for z in range(10):
+        s = blank(3, 3)
+        rect(s, 1, 1, 1, 1, POST)
+        if z <= 7:
+            rect(s, 0, 1, 2, 1, POST)
+        out.append(s)
+    return out
+
+
 def to_sheet(slices: list[Image.Image]) -> Image.Image:
     w, h = slices[0].size
     sheet = Image.new("RGBA", (w * len(slices), h), CLEAR)
@@ -411,6 +553,12 @@ STACKS = {
     "locomotive": locomotive_slices,
     "shed": shed_slices,
     "water_tower": water_tower_slices,
+    "babacu": babacu_slices,
+    "sumauma": sumauma_slices,
+    "cattle": cattle_slices,
+    "capybara": capybara_slices,
+    "fuel_station": fuel_station_slices,
+    "fence_post": fence_post_slices,
 }
 
 

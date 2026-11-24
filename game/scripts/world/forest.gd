@@ -9,19 +9,21 @@ enum Habitat { FOREST, RIVERSIDE, PASTURE }
 ## Slice counts: the contract with tools/build_stacks.py.
 const SLICES := {
 	"castanheira": 35, "seringueira": 27, "acai": 32, "buriti": 32,
-	"ipe": 27, "embauba": 24, "shrub": 8,
+	"ipe": 27, "embauba": 24, "shrub": 8, "babacu": 32, "sumauma": 48,
 }
 
 ## Relative weights per habitat. Castanheiras are protected by law, so in Rondônia
 ## they often stand alone in pasture after the forest around them was cleared.
 const WEIGHTS := {
-	Habitat.FOREST: {"castanheira": 3.0, "seringueira": 4.0, "acai": 3.0, "embauba": 1.0, "ipe": 0.5, "buriti": 0.5},
-	Habitat.RIVERSIDE: {"buriti": 5.0, "acai": 4.0, "seringueira": 1.0, "embauba": 0.5},
-	Habitat.PASTURE: {"embauba": 2.0, "castanheira": 1.0},
+	Habitat.FOREST: {"castanheira": 3.0, "seringueira": 4.0, "acai": 3.0, "embauba": 1.0, "ipe": 0.5,
+		"buriti": 0.5, "babacu": 1.0, "sumauma": 0.4},
+	Habitat.RIVERSIDE: {"buriti": 5.0, "acai": 4.0, "seringueira": 1.0, "embauba": 0.5, "sumauma": 0.5},
+	## Babaçu palms take over cleared pastures in Rondônia; ipês are left standing for shade.
+	Habitat.PASTURE: {"babacu": 4.0, "embauba": 2.0, "castanheira": 1.0, "ipe": 0.6},
 }
 
 ## Chance a tree candidate is kept: dense forest, fairly dense riverbanks, sparse pasture.
-const DENSITY := {Habitat.FOREST: 0.9, Habitat.RIVERSIDE: 0.75, Habitat.PASTURE: 0.07}
+const DENSITY := {Habitat.FOREST: 0.9, Habitat.RIVERSIDE: 0.8, Habitat.PASTURE: 0.12}
 const SHRUB_DENSITY := {Habitat.FOREST: 0.7, Habitat.RIVERSIDE: 0.5, Habitat.PASTURE: 0.0}
 
 const RIVERSIDE_DISTANCE := 93.0     ## px from a river

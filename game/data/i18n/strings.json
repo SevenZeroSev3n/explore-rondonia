@@ -9,7 +9,7 @@
   "PASSPORT_CLOSE": {"en": "Close (P)", "pt_BR": "Fechar (P)"},
   "LANG_TOGGLE": {"en": "PT", "pt_BR": "EN"},
   "HUD_SECRETS": {"en": "Secrets %d/%d", "pt_BR": "Segredos %d/%d"},
-  "HUD_KEYS": {"en": "P: passport · F: camera", "pt_BR": "P: passaporte · F: câmera"},
+  "HUD_KEYS": {"en": "P: passport · F: camera · M: map", "pt_BR": "P: passaporte · F: câmera · M: mapa"},
   "PHOTO_MODE_KEYS": {"en": "Space: shoot · F/Esc: put the camera away", "pt_BR": "Espaço: fotografar · F/Esc: guardar a câmera"},
   "PHOTO_ALREADY": {"en": "Already in your passport: %s", "pt_BR": "Já está no seu passaporte: %s"},
   "PHOTO_HINT_FRAME": {"en": "Fit all of it inside the frame.", "pt_BR": "Enquadre inteiro."},
@@ -44,5 +44,16 @@
   "CREDITS_SOURCES": {"en": "Place texts based on: %s", "pt_BR": "Textos dos lugares baseados em: %s"},
   "CREDITS_FONT": {"en": "Font: Pixelify Sans by the Pixelify Sans Project Authors (SIL Open Font License 1.1)", "pt_BR": "Fonte: Pixelify Sans, dos autores do projeto Pixelify Sans (SIL Open Font License 1.1)"},
   "SHEET_PHOTO_CREDIT": {"en": "Photo: %s · %s", "pt_BR": "Foto: %s · %s"},
-  "CREDITS_PHOTO": {"en": "Photo, %s: %s (%s)", "pt_BR": "Foto, %s: %s (%s)"}
+  "CREDITS_PHOTO": {"en": "Photo, %s: %s (%s)", "pt_BR": "Foto, %s: %s (%s)"},
+  "SPEED_KMH": {"en": "%d km/h", "pt_BR": "%d km/h"},
+  "FUEL_LABEL": {"en": "Fuel", "pt_BR": "Gasolina"},
+  "FUEL_LOW": {"en": "Low on fuel! Next station: %s, %d km", "pt_BR": "Pouca gasolina! Próximo posto: %s, %d km"},
+  "FUEL_FULL": {"en": "Tank full at %s", "pt_BR": "Tanque cheio em %s"},
+  "FUEL_EMPTY": {"en": "Out of fuel… calling a tow truck", "pt_BR": "Acabou a gasolina… chamando o guincho"},
+  "FUEL_TOWED": {"en": "Towed to the station in %s. Tank full!", "pt_BR": "O guincho trouxe você ao posto de %s. Tanque cheio!"},
+  "TRIP_DISTANCE": {"en": "%s: %d km", "pt_BR": "%s: %d km"},
+  "MAP_TITLE": {"en": "Rondônia — BR-364", "pt_BR": "Rondônia — BR-364"},
+  "MAP_INFO_KM": {"en": "You are at km %d of BR-364", "pt_BR": "Você está no km %d da BR-364"},
+  "MAP_INFO_NEXT": {"en": "Next town: %s, %d km", "pt_BR": "Próxima cidade: %s, %d km"},
+  "MAP_LEGEND": {"en": "Yellow: passport cities\nWhite: other towns\nRed: petrol stations\nArrow: you\n\nM: close", "pt_BR": "Amarelo: cidades do passaporte\nBranco: outras cidades\nVermelho: postos\nSeta: você\n\nM: fechar"}
 }

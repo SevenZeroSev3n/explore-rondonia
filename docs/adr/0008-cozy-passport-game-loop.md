@@ -3,6 +3,7 @@
 - Status: accepted
 - Date: 2026-11-23
 - Amends: ADR 0002 (scope), ADR 0007 (publishing)
+- Amended by: ADR 0009 (fuel: an empty tank means a tow, a soft setback)
 
 ## Context
 

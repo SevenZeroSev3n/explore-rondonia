@@ -7,6 +7,8 @@ extends RefCounted
 const ASPHALT := 1.0
 const DIRT := 0.6
 const OFFROAD := 0.35
+## The speedometer reads this at max_speed on asphalt (the map is compressed, ADR 0003).
+const KMH_AT_TOP := 100.0
 
 var max_speed := 120.0      ## px/s on asphalt
 var acceleration := 73.0    ## px/s²
@@ -47,6 +49,11 @@ func step(throttle: float, steer: float, dt: float, surface: float = ASPHALT) ->
 	# naturally because the sign of speed carries through.
 	var authority := clampf(speed / (max_speed * 0.3), -1.0, 1.0)
 	heading = wrapf(heading + steer * steer_rate * authority * dt, -PI, PI)
+
+
+## Speedometer reading (ADR 0009): top speed on asphalt shows 100 km/h.
+func kmh() -> float:
+	return speed / max_speed * KMH_AT_TOP
 
 
 func forward() -> Vector2:

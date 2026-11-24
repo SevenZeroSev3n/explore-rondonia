@@ -2,14 +2,28 @@ extends Node2D
 ## Layer 1: the whole state, from game/data/geo/state_map.json (ADR 0002/0003).
 ## North-up; trees are streamed in chunks around the truck.
 
-const ASPHALT_HALF_WIDTH := 17.0
-const SHOULDER_HALF_WIDTH := 24.0
-const ROAD_TREE_CLEARANCE := 59.0
+const ASPHALT_HALF_WIDTH := 22.0
+const SHOULDER_HALF_WIDTH := 30.0
+const ROAD_TREE_CLEARANCE := 70.0
 const RIVER_HALF_WIDTH := 4.0
 const CHUNK_SIZE := 512.0
 const CHUNK_RADIUS := 1          ## chunks kept around the truck's chunk in each direction
 const TREES_PER_CHUNK := 300
 const SHRUBS_PER_CHUNK := 130
+const DECALS_PER_CHUNK := 260   ## flat ground details (ADR 0009)
+const ANIMAL_SPOTS_PER_CHUNK := 10
+## Fences (ADR 0009): barbed wire on both sides of BR-364 through the pastures.
+const FENCE_OFFSET := 84.0
+const FENCE_SPACING := 26.0
+const FENCE_TOWN_GAP := 300.0       ## no fences inside towns
+const WIRE := Color(0.72, 0.72, 0.7, 0.85)
+## Fuel (ADR 0009): stations at the towns, free refills, a tow when the tank runs dry.
+const STATION_SETBACK := 64.0
+const STATION_CLEARANCE := 72.0     ## nothing grows on the forecourt
+const STATION_REFUEL_RADIUS := 70.0
+const FILL_RATE := 125.0            ## km of range per second at the pump
+const LOW_FUEL := 0.2
+const TOW_DELAY := 2.5              ## seconds stopped on an empty tank before the tow
 ## Planting and clearing are spread over frames so crossing a chunk border never
 ## stalls a frame (hundreds of stacks per chunk; the web build is slower than native).
 const PLANTS_PER_FRAME := 90
@@ -21,12 +35,12 @@ const DIORAMA_SCENE := preload("res://scenes/diorama_efmm.tscn")
 const DIORAMA_TOWN := "Porto Velho"
 const DIORAMA_ENTER_RADIUS := 147.0
 
-const PASTURE := Color("4e7a40")
 const OUTSIDE := Color("2f4a2c")
 const RIVER := Color("4f86b8")
 const DIRT := Color("9c4a2f")
 const ASPHALT := Color("4a4a50")
 const STRIPE := Color("e8c64a")
+const GROUND_TILE := preload("res://assets/ground/pasture_tile.png")
 
 var map: StateMapData
 var catalog: PlaceCatalog
@@ -41,6 +55,13 @@ var _to_plant: Array = []        ## [chunk, candidate, is_shrub], nearest chunks
 var _to_clear: Array[Node] = []
 var _last_chunk := Vector2i(1 << 30, 1 << 30)
 var diorama: Diorama                  ## the active layer-2 scene, or null on the state map
+var progress: RoadProgress            ## km along BR-364 (ADR 0009)
+var stations: Array[Dictionary] = []  ## FuelStations.from_towns
+var tank := FuelTank.new()
+var _last_truck_pos := Vector2.ZERO
+var _tow_timer := -1.0
+var _low_warned := false
+var _refuelling := false              ## a real refill is under way (not a top-up of a few metres)
 
 @onready var ground: Node2D = $Ground
 @onready var entities: Node2D = $Entities
@@ -58,8 +79,12 @@ func _ready() -> void:
 	for r in map.rivers:
 		river_lines.append(r.points)
 	river_index = PolylineIndex.new(river_lines)
+	progress = RoadProgress.new(map.road, map.towns[-1].road_km if not map.towns.is_empty() else 0.0)
+	stations = FuelStations.from_towns(map.towns, map.road, STATION_SETBACK)
+	_preload_sheets()
 	_draw_ground()
 	_place_towns()
+	_place_stations()
 	truck.surface_provider = surface_at
 	truck.bounds_provider = is_inside_state
 	catalog = PlaceCatalog.load_dir()
@@ -79,6 +104,8 @@ func _ready() -> void:
 	hud.refresh()
 	truck.position = map.road[0]
 	truck.model.heading = map.road_heading(0)
+	_last_truck_pos = truck.position
+	hud.setup_trip(map, stations)
 	if not SaveStore.has_flag("tutorial_seen"):
 		hud.show_tutorial.call_deferred()
 	_qa_hooks.call_deferred()
@@ -94,6 +121,8 @@ func _process(_delta: float) -> void:
 	for id in _spot_markers:
 		var m: Node2D = _spot_markers[id]
 		m.visible = truck.position.distance_to(m.position) < SPOT_REVEAL_DISTANCE
+	_update_fuel(_delta)
+	_update_trip_hud()
 	var c := TreeScatter.chunk_of(truck.position, CHUNK_SIZE)
 	if c != _last_chunk:
 		_last_chunk = c
@@ -150,6 +179,7 @@ func enter_diorama() -> void:
 	set_process(false)
 	hud.set_photo_mode(false)
 	hud.keys_hint = "DIORAMA_KEYS"
+	hud.set_trip_visible(false)
 	hud.set_prompt("")
 	add_sibling(diorama)
 	hud.toast(tr("DIORAMA_WELCOME"))
@@ -169,6 +199,7 @@ func exit_diorama() -> void:
 	set_process(true)
 	hud.set_photo_mode(false)
 	hud.keys_hint = "HUD_KEYS"
+	hud.set_trip_visible(true)
 	hud.set_prompt("")
 	var cam: Camera2D = truck.get_node("Camera")
 	cam.make_current()
@@ -208,6 +239,7 @@ func teleport_to(city: String) -> void:
 	if t.is_empty() or not SaveStore.passport.has_stamp(city):
 		return
 	truck.position = t.road_pos
+	_last_truck_pos = truck.position
 	truck.model.speed = 0.0
 	truck.model.heading = map.road_heading(t.road_seg)
 	truck.get_node("Camera").reset_smoothing()
@@ -225,14 +257,15 @@ func is_inside_state(pos: Vector2) -> bool:
 func _draw_ground() -> void:
 	var land := Polygon2D.new()
 	land.polygon = map.border
-	land.color = PASTURE
+	land.texture = GROUND_TILE                      # no UVs: the tile repeats in world pixels
+	land.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
 	ground.add_child(land)
 
 	for r in map.rivers:
 		ground.add_child(_line(r.points, RIVER_HALF_WIDTH * 2.0, RIVER))
 	ground.add_child(_line(map.road, SHOULDER_HALF_WIDTH * 2.0, DIRT))
 	ground.add_child(_line(map.road, ASPHALT_HALF_WIDTH * 2.0, ASPHALT))
-	ground.add_child(_line(map.road, 1.0, STRIPE))
+	ground.add_child(_line(map.road, 2.0, STRIPE))
 
 
 func _line(points: PackedVector2Array, width: float, color: Color) -> Line2D:
@@ -304,6 +337,9 @@ func _stream_chunks(center: Vector2i) -> void:
 			_to_plant.append([c, cand, false])
 		for cand in TreeScatter.candidates(c, CHUNK_SIZE, SHRUBS_PER_CHUNK, WORLD_SEED + 1):
 			_to_plant.append([c, cand, true])
+		_to_plant.append([c, null, "decals"])
+		_to_plant.append([c, null, "fauna"])
+		_to_plant.append([c, null, "fences"])
 
 
 ## Plants and clears a bounded amount each frame.
@@ -319,6 +355,12 @@ func _work_queues(plant_budget: int = PLANTS_PER_FRAME) -> void:
 		var job: Array = _to_plant.pop_front()
 		planted += 1
 		if not _chunks.has(job[0]):
+			continue
+		if typeof(job[2]) == TYPE_STRING:
+			match job[2]:
+				"decals": _chunks[job[0]].append(_decals_for(job[0]))
+				"fauna": _chunks[job[0]].append_array(_fauna_for(job[0]))
+				"fences": _chunks[job[0]].append_array(_fences_for(job[0]))
 			continue
 		var cand: Dictionary = job[1]
 		var h: Variant = _habitat_at(cand.pos)
@@ -344,6 +386,9 @@ func flush_forest() -> void:
 func _habitat_at(p: Vector2) -> Variant:
 	if not is_inside_state(p):
 		return null
+	for st in stations:
+		if p.distance_to(st.pos) < STATION_CLEARANCE:
+			return null
 	var road_d := road_index.distance_within(p, Forest.PASTURE_DISTANCE)
 	if road_d < ROAD_TREE_CLEARANCE:
 		return null
@@ -351,6 +396,23 @@ func _habitat_at(p: Vector2) -> Variant:
 	if river_d < RIVER_HALF_WIDTH + 11.0:
 		return null
 	return Forest.habitat(road_d, river_d)
+
+
+## One node with every ground decal of a chunk, under the entities (ADR 0009).
+func _decals_for(chunk: Vector2i) -> GroundDecals:
+	var d := GroundDecals.new()
+	for cand in TreeScatter.candidates(chunk, CHUNK_SIZE, DECALS_PER_CHUNK, WORLD_SEED + 2):
+		if not is_inside_state(cand.pos):
+			continue
+		var road_d := road_index.distance_within(cand.pos, Forest.PASTURE_DISTANCE)
+		if road_d < SHOULDER_HALF_WIDTH + 4.0:
+			continue
+		var river_d := river_index.distance_within(cand.pos, Forest.RIVERSIDE_DISTANCE)
+		if river_d < RIVER_HALF_WIDTH + 3.0:
+			continue
+		d.add(cand.pos, Forest.pick(GroundDecals.MIX[Forest.habitat(road_d, river_d)], cand.species))
+	ground.add_child(d)
+	return d
 
 
 func _plant(species: String, cand: Dictionary) -> SpriteStack:
@@ -361,5 +423,165 @@ func _plant(species: String, cand: Dictionary) -> SpriteStack:
 	s.slice_count = Forest.SLICES[species]
 	s.angle = cand.angle
 	s.position = cand.pos
+	# A slight per-tree tint so neighbours of one species never look stamped (ADR 0009).
+	var f := fposmod(cand.pos.x * 0.1373 + cand.pos.y * 0.3119, 1.0)
+	var v := 0.86 + f * 0.14
+	s.modulate = Color(v * (0.97 + 0.03 * f), v, v * (1.0 - 0.04 * f))
 	entities.add_child(s)
 	return s
+
+
+## Loads every streamed sheet up front: loading one the first time a species shows up
+## mid-drive costs a visible hitch.
+func _preload_sheets() -> void:
+	var names: Array = Forest.SLICES.keys() + Fauna.SLICES.keys() + ["fence_post", "fuel_station"]
+	for n in names:
+		if not _sheets.has(n):
+			_sheets[n] = load("res://assets/stacks/%s/%s_slices.png" % [n, n])
+
+
+func _stack(stack_name: String, slices: int, pos: Vector2, angle: float) -> SpriteStack:
+	if not _sheets.has(stack_name):
+		_sheets[stack_name] = load("res://assets/stacks/%s/%s_slices.png" % [stack_name, stack_name])
+	var s := SpriteStack.new()
+	s.sheet = _sheets[stack_name]
+	s.slice_count = slices
+	s.angle = angle
+	s.position = pos
+	entities.add_child(s)
+	return s
+
+
+## Static animals (ADR 0009): Nelore herds in the pastures, capybaras on the riverbanks.
+func _fauna_for(chunk: Vector2i) -> Array[Node]:
+	var out: Array[Node] = []
+	for cand in TreeScatter.candidates(chunk, CHUNK_SIZE, ANIMAL_SPOTS_PER_CHUNK, WORLD_SEED + 3):
+		var h: Variant = _habitat_at(cand.pos)
+		if h == null:
+			continue
+		for a in Fauna.group(h, cand.pos, cand.keep, cand.species):
+			if _habitat_at(a.pos) == null:
+				continue
+			if road_index.distance_within(a.pos, FENCE_OFFSET + 10.0) < FENCE_OFFSET + 10.0:
+				continue   # behind the fence, never on the verge
+			out.append(_stack(a.species, Fauna.SLICES[a.species], a.pos, a.angle))
+	return out
+
+
+## Fence posts with two strands of wire to the next post, in the pasture belt only.
+func _fences_for(chunk: Vector2i) -> Array[Node]:
+	var out: Array[Node] = []
+	var rect := Rect2(Vector2(chunk) * CHUNK_SIZE, Vector2(CHUNK_SIZE, CHUNK_SIZE))
+	var near_road := func(q: Vector2) -> float: return road_index.distance_within(q, FENCE_OFFSET)
+	for p in Roadside.fence_posts(map.road, rect, FENCE_OFFSET, FENCE_SPACING, near_road):
+		if not _fence_ok(p.pos):
+			continue
+		var post := _stack("fence_post", 10, p.pos, 0.0)
+		var next: Vector2 = p.next
+		if next.distance_to(p.pos) < FENCE_SPACING * 1.6 and _fence_ok(next):
+			for lift in [4.0, 7.0]:
+				var wire := Line2D.new()
+				wire.points = PackedVector2Array([Vector2(0, -lift), next - p.pos + Vector2(0, -lift)])
+				wire.width = 1.0
+				wire.default_color = WIRE
+				post.add_child(wire)
+		out.append(post)
+	return out
+
+
+func _fence_ok(p: Vector2) -> bool:
+	if not is_inside_state(p):
+		return false
+	if river_index.distance_within(p, RIVER_HALF_WIDTH + 24.0) < RIVER_HALF_WIDTH + 24.0:
+		return false
+	for t in map.towns:
+		if p.distance_to(t.road_pos) < FENCE_TOWN_GAP:
+			return false
+	return true
+
+
+func _place_stations() -> void:
+	for st in stations:
+		_stack("fuel_station", 24, st.pos, st.angle)
+
+
+func _station_near(p: Vector2) -> Dictionary:
+	for st in stations:
+		if p.distance_to(st.pos) <= STATION_REFUEL_RADIUS:
+			return st
+	return {}
+
+
+## Burns fuel with distance, refills at a station when stopped, tows on an empty tank.
+func _update_fuel(delta: float) -> void:
+	var moved := truck.position.distance_to(_last_truck_pos)
+	_last_truck_pos = truck.position
+	if moved < 200.0:   # a teleport or a tow is not driving
+		tank.burn_km(moved / (map.px_per_m * 1000.0))
+	var st := _station_near(truck.position)
+	var stopped_at_pump := not st.is_empty() and absf(truck.model.speed) < 6.0
+	if stopped_at_pump and tank.fraction() < 0.95:
+		_refuelling = true
+	if stopped_at_pump and _refuelling:
+		tank.fill_step(delta, FILL_RATE)
+		if tank.is_full():
+			_refuelling = false
+			hud.toast(tr("FUEL_FULL") % st.town)
+	elif not stopped_at_pump:
+		_refuelling = false
+	if tank.fraction() > 0.5:
+		_low_warned = false
+	elif tank.fraction() < LOW_FUEL and not _low_warned and not tank.is_empty():
+		_low_warned = true
+		var km := progress.km_at(truck.position)
+		var ahead := FuelStations.next_ahead(stations, km)
+		if ahead.is_empty():
+			ahead = FuelStations.nearest(stations, km)
+		hud.toast(tr("FUEL_LOW") % [ahead.town, roundi(absf(ahead.road_km - km))])
+	truck.engine_on = not tank.is_empty()
+	if not tank.is_empty():
+		_tow_timer = -1.0
+	elif _tow_timer < 0.0:
+		_tow_timer = TOW_DELAY
+		hud.toast(tr("FUEL_EMPTY"))
+	else:
+		_tow_timer -= delta
+		if _tow_timer <= 0.0:
+			tow()
+
+
+## ADR 0009: the soft setback. A tow truck takes you to the nearest station, tank full.
+func tow() -> void:
+	var st := FuelStations.nearest(stations, progress.km_at(truck.position))
+	if st.is_empty():
+		tank.fill()
+		return
+	truck.position = progress.point_at_km(st.road_km)
+	_last_truck_pos = truck.position
+	truck.model.speed = 0.0
+	truck.model.heading = map.road_heading(map.town(st.town).get("road_seg", 0))
+	truck.get_node("Camera").reset_smoothing()
+	tank.fill()
+	truck.engine_on = true
+	_tow_timer = -1.0
+	hud.toast(tr("FUEL_TOWED") % st.town)
+
+
+func _update_trip_hud() -> void:
+	var km := progress.km_at(truck.position)
+	var next := {}
+	for t in map.towns:
+		if t.road_km > km + 0.5:
+			next = t
+			break
+	hud.update_trip({
+		"kmh": absf(truck.model.kmh()),
+		"fuel": tank.fraction(),
+		"pos": truck.position,
+		"heading": truck.model.heading,
+		"km": km,
+		"next_town": next.get("name", ""),
+		"next_km": maxf(0.0, next.get("road_km", km) - km),
+		"end_town": map.towns[-1].name if not map.towns.is_empty() else "",
+		"end_km": maxf(0.0, progress.total_km - km),
+	})

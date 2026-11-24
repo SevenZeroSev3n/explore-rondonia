@@ -9,6 +9,7 @@ How the 12 sprite-stacked objects of Explore Rondônia go from an AI image to th
 | `01-vehicles-and-traveler.md` | the pickup truck and the traveler on foot |
 | `02-madeira-mamore.md` | locomotive, railway shed, Três Caixas d'Água |
 | `03-forest.md` | the six tree species and the undergrowth shrub |
+| `04-road-trip.md` | petrol station, babaçu, sumaúma, Nelore cattle, capybara (ADR 0009) |
 
 ## 1. What you are making
 

@@ -42,6 +42,13 @@ STACKS = {
     "locomotive": (24, 53, 23, 12),
     "shed": (85, 48, 27, 12),
     "water_tower": (21, 21, 48, 8),
+    # ADR 0009 road trip
+    "babacu": (24, 24, 32, 8),
+    "sumauma": (40, 40, 48, 10),
+    "cattle": (8, 20, 13, 6),
+    "capybara": (6, 11, 6, 6),
+    "fuel_station": (64, 48, 24, 12),
+    "fence_post": (3, 3, 10, 3),
 }
 
 # Per-stack carving options for four-view sheets (views_to_slices.silhouette):

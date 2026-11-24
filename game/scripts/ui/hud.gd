@@ -66,6 +66,23 @@ var _complete := {}
 var _credits := {}
 var _complete_pending := false   ## the last photo's sheet shows first, then "complete"
 
+## Road trip (ADR 0009): minimap, distances, speedometer, fuel gauge and the full map (M).
+var _trip: Control
+var _minimap: MapView
+var _trip_next: Label
+var _trip_end: Label
+var _speed: Label
+var _fuel_label: Label
+var _fuel_back: ColorRect
+var _fuel_fill: ColorRect
+var _map_panel: PanelContainer
+var _map_title: Label
+var _map_view: MapView
+var _map_info: Label
+var _map_legend: Label
+var _trip_data := {}
+var _trip_on := true
+
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -101,6 +118,10 @@ func _ready() -> void:
 	_toast.offset_top = 67
 	_toast.offset_bottom = 88
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_toast.offset_left = 150          # clear of the counters and the minimap
+	_toast.offset_right = -150
+	_toast.offset_bottom = 110
 	_toast.modulate.a = 0.0
 
 	_prompt = _label(_root, Vector2.ZERO)
@@ -127,6 +148,11 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _map_panel and _map_panel.visible:
+		if event.is_action_pressed("map") or event.is_action_pressed("ui_cancel"):
+			toggle_map()
+			get_viewport().set_input_as_handled()
+		return
 	for info in [_tutorial, _complete, _credits]:
 		if info.panel.visible:
 			if event.is_action_pressed("ui_cancel"):
@@ -143,6 +169,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif _panel.visible:
 		return
+	elif event.is_action_pressed("map") and _map_panel and _trip_on and not photo_mode:
+		toggle_map()
+		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("photo") or (photo_mode and event.is_action_pressed("ui_cancel")):
 		set_photo_mode(not photo_mode if event.is_action_pressed("photo") else false)
 		get_viewport().set_input_as_handled()
@@ -188,6 +217,10 @@ func refresh() -> void:
 	_fill_infos()
 	_key_hint.text = tr("PHOTO_MODE_KEYS") if photo_mode else tr(keys_hint)
 	_lang.text = tr("LANG_TOGGLE")
+	if _trip:
+		_fuel_label.text = tr("FUEL_LABEL")
+		_map_title.text = tr("MAP_TITLE")
+		_map_legend.text = tr("MAP_LEGEND")
 	_title.text = tr("PASSPORT_TITLE")
 	_subtitle.text = tr("PASSPORT_STAMPS")
 	_secrets_title.text = tr("PASSPORT_SECRETS")
@@ -327,14 +360,150 @@ func _update_pause() -> void:
 	for info in [_tutorial, _complete, _credits]:
 		if not info.is_empty() and info.panel.visible:
 			info_open = true
-	get_tree().paused = _panel.visible or _sheet.visible or info_open
+	var map_open := _map_panel != null and _map_panel.visible
+	get_tree().paused = _panel.visible or _sheet.visible or info_open or map_open
 	# The HUD behind a panel would show through it and compete with its text.
 	for l in [_counter, _landmarks_counter, _secrets_counter, _key_hint, _prompt]:
 		l.visible = not get_tree().paused
+	if _trip:
+		_trip.visible = _trip_on and not get_tree().paused
 	if get_tree().paused:
 		if _toast_tween:
 			_toast_tween.kill()
 		_toast.modulate.a = 0.0   # never show a toast through a panel
+
+
+# --- road trip: minimap, speedometer, fuel, full map (ADR 0009) -----------
+
+## Builds the trip HUD for this map. Called once by the state map.
+func setup_trip(map: StateMapData, stations: Array[Dictionary]) -> void:
+	_trip = Control.new()
+	_trip.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_trip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_root.add_child(_trip)
+	_root.move_child(_trip, 0)   # under every panel
+
+	var mini_frame := PanelContainer.new()
+	mini_frame.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	mini_frame.position = Vector2(-132, 24)
+	mini_frame.custom_minimum_size = Vector2(124, 92)
+	mini_frame.modulate = Color(1, 1, 1, 0.92)
+	_trip.add_child(mini_frame)
+	_minimap = MapView.new()
+	_minimap.map = map
+	_minimap.stations = stations
+	_minimap.custom_minimum_size = Vector2(122, 90)
+	mini_frame.add_child(_minimap)
+	_trip_next = _right_label(_trip, 118)
+	_trip_end = _right_label(_trip, 138)
+
+	_fuel_label = _label(_trip, Vector2.ZERO)
+	_fuel_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	_fuel_label.offset_left = -200
+	_fuel_label.offset_right = -96
+	_fuel_label.offset_top = -50
+	_fuel_label.offset_bottom = -30
+	_fuel_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_fuel_back = ColorRect.new()
+	_fuel_back.color = Color(0, 0, 0, 0.75)
+	_fuel_back.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	_fuel_back.offset_left = -90
+	_fuel_back.offset_right = -8
+	_fuel_back.offset_top = -43
+	_fuel_back.offset_bottom = -34
+	_trip.add_child(_fuel_back)
+	_fuel_fill = ColorRect.new()
+	_fuel_fill.position = Vector2(1, 1)
+	_fuel_fill.size = Vector2(80, 7)
+	_fuel_back.add_child(_fuel_fill)
+	_speed = _label(_trip, Vector2.ZERO)
+	_speed.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	_speed.offset_left = -160
+	_speed.offset_right = -8
+	_speed.offset_top = -25
+	_speed.offset_bottom = -3
+	_speed.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+
+	# Full map: the state on the left as big as the screen allows, the text on the right.
+	_map_panel = _centred_panel(Vector2(608, 0))
+	var outer := _map_panel.get_child(0).get_child(0) as VBoxContainer
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 11)
+	outer.add_child(row)
+	_map_view = MapView.new()
+	_map_view.map = map
+	_map_view.stations = stations
+	_map_view.detailed = true
+	_map_view.custom_minimum_size = Vector2(330, 316)
+	row.add_child(_map_view)
+	var side := VBoxContainer.new()
+	side.add_theme_constant_override("separation", 11)
+	row.add_child(side)
+	_map_title = _heading(side)
+	_map_info = Label.new()
+	_map_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_map_info.custom_minimum_size = Vector2(245, 0)
+	side.add_child(_map_info)
+	_map_legend = _dim("")
+	_map_legend.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_map_legend.custom_minimum_size = Vector2(245, 0)
+	side.add_child(_map_legend)
+	refresh()
+
+
+## Fed every frame by the state map: {kmh, fuel, pos, heading, km, next_town, next_km,
+## end_town, end_km}.
+func update_trip(d: Dictionary) -> void:
+	if _trip == null:
+		return
+	_trip_data = d
+	_speed.text = tr("SPEED_KMH") % roundi(d.kmh)
+	var f: float = d.fuel
+	_fuel_fill.size.x = maxf(0.0, 80.0 * f)
+	var low := f < 0.2
+	_fuel_fill.color = Color("d8503c") if low else (Color("e8c64a") if f < 0.5 else Color("6cc04a"))
+	_fuel_fill.visible = not low or fmod(Time.get_ticks_msec() / 400.0, 2.0) < 1.4
+	_minimap.set_player(d.pos, d.heading)
+	_trip_next.text = tr("TRIP_DISTANCE") % [d.next_town, roundi(d.next_km)] if d.next_town != "" else ""
+	_trip_end.text = tr("TRIP_DISTANCE") % [d.end_town, roundi(d.end_km)] if d.end_km > 0.5 else ""
+
+
+func set_trip_visible(on: bool) -> void:
+	_trip_on = on
+	if _trip:
+		_trip.visible = on and not get_tree().paused
+
+
+func toggle_map() -> void:
+	_map_panel.visible = not _map_panel.visible
+	if _map_panel.visible:
+		set_photo_mode(false)
+		_fill_map()
+	_update_pause()
+
+
+func _fill_map() -> void:
+	if _trip_data.is_empty():
+		return
+	var d := _trip_data
+	_map_view.set_player(d.pos, d.heading)
+	var info := tr("MAP_INFO_KM") % roundi(d.km)
+	if d.next_town != "":
+		info += "\n\n" + tr("MAP_INFO_NEXT") % [d.next_town, roundi(d.next_km)]
+	if d.end_km > 0.5:
+		info += "\n" + tr("TRIP_DISTANCE") % [d.end_town, roundi(d.end_km)]
+	_map_info.text = info
+
+
+func _right_label(parent: Control, top: float) -> Label:
+	var l := _label(parent, Vector2.ZERO)
+	l.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	l.offset_left = -240
+	l.offset_right = -8
+	l.offset_top = top
+	l.offset_bottom = top + 20
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	return l
 
 
 # --- tutorial, passport complete, credits ---------------------------------

@@ -38,10 +38,11 @@ BR-364 from Vilhena to Porto Velho; cities Vilhena, Ji-Paraná, Ariquemes, Porto
 d'Água, Madeira river bank); one generic pickup truck; off-road allowed but slow, state border is
 the limit; procedural roadside from simple rules plus real rivers and bridges; ambient track and
 engine sound; local save of visited cities; pt-BR + English (browser locale, PT/EN toggle);
-credits screen.
+credits screen; road-trip layer (ADR 0009): speedometer, fuel with petrol stations in the BR-364
+towns and a tow when the tank runs dry, minimap and full map, fences, static animals.
 
-Out: day/night, weather, traffic/NPCs, story missions, photo scoring/stars, economy/freight,
-fail states, cloud save, touch/mobile, other highways,
+Out: day/night, weather, traffic/NPCs (moving animals included), story missions, photo
+scoring/stars, economy/freight (fuel is free), fail states (the tow is a soft setback), cloud save, touch/mobile, other highways,
 MapBiomas land cover, Setur-RO material.
 
 ## Architecture decisions

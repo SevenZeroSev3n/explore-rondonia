@@ -8,7 +8,9 @@ it actually grows (`game/scripts/world/forest.gd`):
 |---|---|---|
 | **Forest** (away from the road) | castanheira, seringueira, açaí, embaúba, rare ipê and buriti, shrubs underneath | mixed terra-firme rainforest; dense, with groves and clearings |
 | **Riverside** (near rivers) | buriti, açaí, some seringueira | buriti and açaí palms line wet ground and rivers |
-| **Pasture** (the cleared belt along BR-364) | a few embaúbas and lone castanheiras | cattle pasture; castanheiras are protected by law, so they are often left standing alone after clearing — a typical Rondônia roadside sight |
+| **Pasture** (the cleared belt along BR-364) | babaçu palms, embaúbas, lone castanheiras, a few ipês | cattle pasture; castanheiras are protected by law, so they are often left standing alone after clearing — a typical Rondônia roadside sight; babaçu takes over cleared land |
+
+Babaçu and sumaúma (added by ADR 0009) have their prompts in `04-road-trip.md`.
 
 Trees are symmetric, so their SIDE, FRONT and BACK views can be the same drawing; that is
 correct and makes generation easier. What matters most is the **TOP view** (the crown seen from

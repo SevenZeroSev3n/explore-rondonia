@@ -17,6 +17,7 @@ func _enter_tree() -> void:
 	_action("interact", [_key(KEY_ENTER), _key(KEY_KP_ENTER), _button(JOY_BUTTON_LEFT_SHOULDER)])
 	_action("rotate_view_left", [_key(KEY_Q), _axis(JOY_AXIS_RIGHT_X, -1.0)])
 	_action("rotate_view_right", [_key(KEY_E), _axis(JOY_AXIS_RIGHT_X, 1.0)])
+	_action("map", [_key(KEY_M), _button(JOY_BUTTON_BACK)])
 
 
 func _action(action_name: StringName, events: Array) -> void:

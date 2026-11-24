@@ -25,6 +25,13 @@ measured from the camera. Landmarks are place files with `diorama_layout`. With 
 `SpriteStack.view_rotation` keeps slices lifting up on screen and the diorama sorts entities by
 screen y (ground stays at the minimum z).
 
+Road trip (ADR 0009): a speedometer (100 km/h at top speed), a fuel tank of 250 km that refills
+for free at the petrol station of each BR-364 town and is towed to the nearest one when it runs
+dry, a minimap and a full map on M (`scripts/trip/`, `scripts/ui/map_view.gd`). The roadside has
+a textured ground with decals, barbed-wire fences in the pastures, babaçu and sumaúma among the
+trees, and static Nelore cattle and capybaras (`scripts/world/roadside.gd`, `fauna.gd`,
+`ground_decals.gd`).
+
 The MVP loop is complete: a one-screen tutorial on a fresh save, "passport complete" once the
 4 stamps, 4 Madeira-Mamoré photos and 3 secrets are in (after the last photo's sheet), and a
 credits screen (`scripts/game/credits.gd`). One-off flags live in `SaveStore.flags`.
@@ -45,6 +52,7 @@ Godot 4.7.2 on PATH as `godot`; web export templates (no-threads) installed for 
 | `godot --headless --path game -s addons/gut/gut_cmdln.gd -gdir=res://test/unit,res://test/integration -ginclude_subdirs -gexit` | GUT unit tests |
 | `python -m pytest tools/tests -q` | Python pipeline tests (needs `pip install -r tools/requirements.txt`) |
 | `python3 tools/build_stacks.py [--only NAME]` | Build every slice sheet: slices `art/vox/<name>.vox`, else carves `art/views/<name>_views.png` (AI 4-view sheets, see `art/views/00-workflow.md`), else the code-drawn placeholder |
+| `python3 tools/make_ground.py` | Draw the ground tile and decal atlas into `game/assets/ground/` |
 | `python3 tools/vox_models.py [--only NAME] [--force]` | Write the code-built voxel models into `art/vox/` (never overwrites without `--force`; see `art/vox/README.md`) |
 | `python3 tools/preview_stack.py SHEET --count N OUT.png` | Turntable preview of a slice sheet, drawn like `SpriteStack` |
 | `python3 tools/geo/fetch.py [--force]` | Download OSM/IBGE geodata into `tools/cache/` (git-ignored) |
@@ -64,6 +72,7 @@ build to GitHub Pages from `main`.
 | Art assets | `docs/adr/0004-art-pipeline-ai-plus-procedural.md`, `docs/adr/0005-visual-style.md` |
 | Place sheets, text, photos, i18n | `docs/adr/0006-content-as-bilingual-data.md` |
 | Game loop, passport, photo mode, secrets | `docs/adr/0008-cozy-passport-game-loop.md`, `docs/research/roadside-secrets.md` |
+| Fuel, petrol stations, speedometer, map, fences, animals | `docs/adr/0009-road-trip-fuel-map-roadside.md` |
 | CI, hosting, tests | `docs/adr/0007-repo-ci-hosting-tests.md` |
 
 ## Rules
